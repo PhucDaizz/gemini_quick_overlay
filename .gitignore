@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+venv/
+env/
+
+# PyInstaller (file đóng gói exe)
+build/
+dist/
+*.spec
+*.exe
+
+# User Configuration & Data
+chrome_path.txt
+ChromeProfile/
+*.log
+
+# VS Code
+.vscode/

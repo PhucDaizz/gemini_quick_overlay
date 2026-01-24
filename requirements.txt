@@ -1,0 +1,5 @@
+selenium
+keyboard
+pyperclip
+webdriver-manager
+pywin32

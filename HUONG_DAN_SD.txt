@@ -1,0 +1,31 @@
+=== HUONG DAN SU DUNG TOOL HO TRO ===
+
+BUOC 1: CHUAN BI
+- Dam bao may tinh da cai dat Google Chrome.
+- Giai nen thu muc tool ra o cung (vi du o D: hoac Desktop).
+
+BUOC 2: KHOI DONG
+- Chi can chay file "START_TOOL.bat".
+- Phan mem se tu dong mo Chrome va chay ngam.
+- Lan dau tien, Chrome se hien ra -> Ban can DANG NHAP vao https://gemini.google.com/app mot lan duy nhat.
+
+BUOC 3: SU DUNG
+1. Copy noi dung can hoi (Boi den + Ctrl C).
+2. Nhan phim F2 de gui cau hoi.
+3. Dap an se hien o goc trai duoi man hinh.
+   - Nhan F4 de xem lai dap an cu.
+   - Nhan ESC de tat dap an ngay lap tuc.
+
+=== KHAC PHUC LOI ===
+1. Loi "Khong tim thay Google Chrome":
+   - Nguyen nhan: Do ban cai Chrome o vi tri khac (khong phai mac dinh).
+   - Cach sua:
+     + Chuot phai vao shortcut Chrome tren Desktop -> Chon Properties.
+     + Copy dong "Target" (vi du: D:\MySoft\Chrome.exe).
+     + Mo file "chrome_path.txt" trong thu muc tool.
+     + Paste duong dan do vao roi Luu lai.
+     + Chay lai START_TOOL.bat.
+
+2. Loi khong hien dap an:
+   - Thu kiem tra xem ban da dang nhap Gemini trong cua so Chrome do chua.
+   - Thu tat het Chrome va chay lai tool.
