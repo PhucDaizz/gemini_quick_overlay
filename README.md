@@ -22,7 +22,7 @@
 
 ### Cách 1: Dành cho người dùng phổ thông (File EXE)
 1. Tải file `.exe` từ mục Releases (nếu có).
-2. Chạy file `START_TOOL.bat`.
+2. Chạy file `START_TOOL.vbs`.
 
 ### Cách 2: Dành cho Developer (Chạy từ Source)
 1. Clone repo này về máy:
@@ -37,17 +37,25 @@
    ```
 
 3. Chạy ứng dụng:
-   Click đúp vào `START_TOOL.bat` (khuyên dùng) hoặc chạy lệnh:
-   ```bash
-   python gemini_helper_v2_window_activation.py
-   ```
+   Click đúp vào `START_TOOL.vbs` (khuyên dùng) để chạy ẩn hoàn toàn.
 
 ## 🎮 Hướng dẫn sử dụng
+**Bước 1: Khởi động Chrome (Nền tảng)**
+- Chạy file `START_TOOL.vbs`.
+- Chrome sẽ khởi động. Nếu là chạy lần đầu, hãy đăng nhập Gemini.
 
-**Bước 1: Khởi động**
-- Chạy `START_TOOL.bat`.
-- Một cửa sổ Chrome sẽ hiện ra (lần đầu tiên), hãy **Đăng nhập vào Gemini** (https://gemini.google.com).
-- Sau khi đăng nhập, bạn có thể minimize Chrome hoặc để nó tự chạy ngầm.
+**⛔ LƯU Ý SỐNG CÒN (QUAN TRỌNG):**
+> **KHÔNG ĐƯỢC nhấn nút (-) Minimize** để ẩn Chrome.
+> Nếu Chrome bị Minimize, Windows sẽ đóng băng nó và tool sẽ **NGỪNG HOẠT ĐỘNG**.
+>
+> ✅ **Cách đúng:** Hãy cứ để cửa sổ Chrome mở đó, và bật trình duyệt khác hoặc ứng dụng khác **ĐÈ LÊN** nó. Chrome phải nằm ở dưới cùng (Background) nhưng vẫn ở trạng thái mở (Restored).
+
+**Bước 2: Chạy Tool**
+- Chạy file `.exe` (đã tải về) hoặc file code Python.
+- Tool sẽ kết nối với Chrome ngầm và sẵn sàng hoạt động.
+
+
+
 
 **Bước 2: Thao tác**
 1. Bôi đen nội dung câu hỏi/văn bản.

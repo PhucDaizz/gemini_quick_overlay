@@ -10,7 +10,7 @@ env/
 build/
 dist/
 *.spec
-*.exe
+# *.exe  <-- Cho phep up file exe len git
 
 # User Configuration & Data
 chrome_path.txt
