@@ -20,9 +20,12 @@
 
 ## 📦 Cài đặt
 
-### Cách 1: Dành cho người dùng phổ thông (File EXE)
-1. Tải file `.exe` từ mục Releases (nếu có).
-2. Chạy file `START_TOOL.vbs`.
+### Cách 1: Dành cho người dùng phổ thông
+1. Tải bộ cài (Download ZIP) từ nút **Code** màu xanh ở trên và giải nén.
+2. **Bước 1:** Chạy file `START_TOOL.vbs` để bật Chrome ngầm.
+3. **Bước 2:** Chạy file `gemini_helper_v2_window_activation.exe` để bật Tool.
+
+
 
 ### Cách 2: Dành cho Developer (Chạy từ Source)
 1. Clone repo này về máy:
