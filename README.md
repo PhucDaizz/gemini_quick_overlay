@@ -37,7 +37,12 @@
    ```
 
 3. Chạy ứng dụng:
-   Click đúp vào `START_TOOL.vbs` (khuyên dùng) để chạy ẩn hoàn toàn.
+   - **Bước 1:** Chạy `START_TOOL.vbs` để bật Chrome ngầm.
+   - **Bước 2:** Chạy lệnh sau để bật Tool:
+     ```bash
+     python gemini_helper_v2_window_activation.py
+     ```
+
 
 ## 🎮 Hướng dẫn sử dụng
 **Bước 1: Khởi động Chrome (Nền tảng)**
