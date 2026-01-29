@@ -7,8 +7,10 @@
 ## ✨ Tính năng nổi bật
 
 - 🚀 **Tốc độ cao**: Tự động lấy nội dung từ Clipboard và gửi cho Gemini chỉ với 1 phím bấm.
-- 👻 **Chế độ tàng hình**: Chrome chạy ngầm hoàn toàn, không chiếm màn hình làm việc.
+- �️ **Hỗ trợ HÌNH ẢNH**: Copy ảnh (hoặc chụp màn hình) -> Bấm F2 -> Tool tự gửi ảnh và yêu cầu giải.
+- �👻 **Chế độ tàng hình**: Chrome chạy ngầm hoàn toàn, không chiếm màn hình làm việc.
 - 🎨 **Giao diện trong suốt**: Kết quả hiện trên nền trong suốt, chữ đen rõ nét, không che khuất tầm nhìn.
+- ⚙️ **Tùy chỉnh mạnh mẽ**: Cho phép chỉnh màu sắc, độ mờ, font chữ và cả Prompt (câu lệnh) thông qua file `config.json`.
 - ⌨️ **Phím tắt tiện lợi**: Thao tác hoàn toàn bằng bàn phím.
 - 🔧 **Tự động tìm Chrome**: Tự động dò tìm đường dẫn cài đặt Chrome trên máy.
 
@@ -23,9 +25,7 @@
 ### Cách 1: Dành cho người dùng phổ thông
 1. Tải bộ cài (Download ZIP) từ nút **Code** màu xanh ở trên và giải nén.
 2. **Bước 1:** Chạy file `START_TOOL.vbs` để bật Chrome ngầm.
-3. **Bước 2:** Chạy file `gemini_helper_v2_window_activation.exe` để bật Tool.
-
-
+3. **Bước 2:** Chạy file `gemini_helper_v2_window_activation.exe` (hoặc tên file bạn đã đổi) để bật Tool.
 
 ### Cách 2: Dành cho Developer (Chạy từ Source)
 1. Clone repo này về máy:
@@ -46,8 +46,8 @@
      python gemini_helper_v2_window_activation.py
      ```
 
-
 ## 🎮 Hướng dẫn sử dụng
+
 **Bước 1: Khởi động Chrome (Nền tảng)**
 - Chạy file `START_TOOL.vbs`.
 - Chrome sẽ khởi động. Nếu là chạy lần đầu, hãy đăng nhập Gemini.
@@ -62,23 +62,36 @@
 - Chạy file `.exe` (đã tải về) hoặc file code Python.
 - Tool sẽ kết nối với Chrome ngầm và sẵn sàng hoạt động.
 
-
-
-
-**Bước 2: Thao tác**
-1. Bôi đen nội dung câu hỏi/văn bản.
-2. Nhấn `Ctrl + C` để Copy.
-3. Nhấn **Phím tắt** để ra lệnh cho AI.
+**Bước 3: Thao tác (Text & Ảnh)**
+1. **Đối với Văn bản:** Bôi đen -> `Ctrl + C`.
+2. **Đối với Hình ảnh:** Chụp màn hình (Win + Shift + S) hoặc Copy ảnh bất kỳ.
+3. Nhấn phím **F2**.
+4. Chờ kết quả hiện ở góc màn hình.
 
 **⌨️ Danh sách Phím tắt:**
 
 | Phím | Chức năng |
 |------|-----------|
-| **F2** | **GỬI CÂU HỎI** (Lấy từ Clipboard -> Gửi Gemini -> Hiện đáp án) |
-| **F4** | **XEM LẠI** (Hiển thị lại đáp án cũ trong 2 giây nếu bạn lỡ nhìn không kịp) |
-| **ESC** | **ẨN NGAY** (Tắt ngay lập tức lớp phủ đáp án) |
+| **F2** | **GỬI (AUTO)**: Tự phát hiện Text hoặc Ảnh trong Clipboard để gửi đi. |
+| **F4** | **XEM LẠI**: Hiển thị lại đáp án cũ trong 2 giây. |
+| **ESC** | **ẨN NGAY**: Tắt ngay lập tức lớp phủ đáp án. |
 
-## ⚙️ Cấu hình nâng cao
+## ⚙️ Tùy chỉnh (File `config.json`)
+
+Bạn có thể mở file `config.json` bằng Notepad để chỉnh sửa các thông số:
+
+| Tham số | Ý nghĩa | Mặc định |
+|---------|---------|----------|
+| `text_color` | Màu chữ (ví dụ: "red", "#ff0000", "black") | "black" |
+| `background_color` | Màu nền (dạng hex) | "#abcdef" |
+| `opacity` | Độ mờ của giao diện (0.1 - 1.0) | 0.5 |
+| `font_size` | Cỡ chữ | 11 |
+| `position_bottom_offset` | Khoảng cách so với đáy màn hình | 50 |
+| `position_left_offset` | Khoảng cách so với cạnh trái | 20 |
+| `prompt_text` | Câu lệnh gửi kèm khi copy Text | "chỉ trả lời..." |
+| `prompt_image` | Câu lệnh gửi kèm khi copy Ảnh | "hãy giải bài..." |
+
+## ⚙️ Cấu hình nâng cao (Chrome Path)
 
 Nếu máy bạn cài Chrome ở vị trí khác (không phải ổ C mặc định), hãy tạo file `chrome_path.txt` cùng thư mục và dán đường dẫn file `chrome.exe` vào đó. Tool sẽ tự nhận diện.
 
@@ -88,4 +101,4 @@ Nếu máy bạn cài Chrome ở vị trí khác (không phải ổ C mặc đ�
 - Tool hoạt động dựa trên automation giao diện Web Gemini, do đó nếu Google thay đổi giao diện, tool có thể cần được cập nhật.
 
 ---
-*Made with ❤️ by PĐ*
+*Made with ❤️ by PĐ
