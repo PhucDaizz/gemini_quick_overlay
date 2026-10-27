@@ -28,6 +28,7 @@
 1. Tải bộ cài (Download ZIP) từ nút **Code** màu xanh ở trên và giải nén.
 2. **Bước 1:** Chạy file `START_TOOL.vbs` để bật Chrome ngầm.
 3. **Bước 2:** Chạy file `gemini_helper_v2_window_activation.exe` (hoặc tên file bạn đã đổi) để bật Tool.
+4. **Tắt Tool:** Chạy `TAT_TOOL.bat` hoặc Task Manager → End task `gemini_helper_v2_window_activation`.
 
 ### Cách 2: Dành cho Developer (Chạy từ Source)
 1. Clone repo này về máy:
@@ -78,6 +79,11 @@
 | **F4** | **XEM LẠI**: Hiển thị lại đáp án cũ trong 2 giây. |
 | **ESC** | **ẨN NGAY**: Tắt ngay lập tức lớp phủ đáp án. |
 
+**Tắt Tool**
+- Chạy `TAT_TOOL.bat` để tắt tool đang chạy (Chrome vẫn mở).
+- Hoặc mở Task Manager → tìm `gemini_helper_v2_window_activation` → End task.
+- Nếu bạn đổi tên file `.exe`, sửa lại tên tương ứng trong `TAT_TOOL.bat`.
+
 ## ⚙️ Tùy chỉnh (File `config.json`)
 
 Bạn có thể mở file `config.json` bằng Notepad để chỉnh sửa các thông số:
@@ -107,6 +113,17 @@ Nếu máy bạn cài Chrome ở vị trí khác (không phải ổ C mặc đ�
 Nếu cổng `debug_port` đang bị ứng dụng khác (VS Code, Electron...) chiếm, tool sẽ báo lỗi thay vì điều khiển nhầm cửa sổ. Hãy đổi `debug_port` trong `config.json`; `START_TOOL.vbs` sẽ tự đọc cổng này.
 
 Nhật ký hoạt động được ghi xoay vòng tại `gemini_helper.log` (tối đa ~4 MB, 3 bản backup).
+
+## 📤 Chia sẻ cho người dùng phổ thông
+
+Chỉ cần gửi một thư mục/ZIP gồm:
+- `gemini_helper_v2_window_activation.exe`
+- `START_TOOL.vbs`
+- `config.json` (tùy chọn, nên dùng bản mặc định)
+- `TAT_TOOL.bat`
+- `HUONG_DAN.txt` (nếu có)
+
+Không gửi source `.py`, `build/`, `dist/`, file log hoặc các file `.exe` cũ.
 
 ## ⚠️ Lưu ý
 
