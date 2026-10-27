@@ -3,8 +3,8 @@
     "background_color": "#abcdef",
     "opacity": 0.5,
     "font_size": 11,
-    "position_bottom_offset": 20,
-    "position_left_offset": 20,
+    "position_bottom_offset": 5,
+    "position_left_offset": 5,
     "prompt_text": "chỉ trả lời đáp án không giải thích gì thêm hoặc cung cấp thông tin gì khác: ",
     "prompt_image": "hãy giải bài tập trong ảnh hiện tại này, không giải thích gì thêm chỉ trả lời đáp án ngắn gọn: "
 }

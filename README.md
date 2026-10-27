@@ -13,6 +13,8 @@
 - ⚙️ **Tùy chỉnh mạnh mẽ**: Cho phép chỉnh màu sắc, độ mờ, font chữ và cả Prompt (câu lệnh) thông qua file `config.json`.
 - ⌨️ **Phím tắt tiện lợi**: Thao tác hoàn toàn bằng bàn phím.
 - 🔧 **Tự động tìm Chrome**: Tự động dò tìm đường dẫn cài đặt Chrome trên máy.
+- ⚡ **Kết nối CDP trực tiếp**: Không cần chromedriver, khởi động nhanh; tự fallback Selenium nếu CDP không khả dụng.
+- 🧩 **Chống chạy trùng**: Tự phát hiện instance đang chạy; ghi log xoay vòng ra `gemini_helper.log`.
 
 ## 🛠 Yêu cầu hệ thống
 
@@ -90,10 +92,21 @@ Bạn có thể mở file `config.json` bằng Notepad để chỉnh sửa các 
 | `position_left_offset` | Khoảng cách so với cạnh trái | 20 |
 | `prompt_text` | Câu lệnh gửi kèm khi copy Text | "chỉ trả lời..." |
 | `prompt_image` | Câu lệnh gửi kèm khi copy Ảnh | "hãy giải bài..." |
+| `debug_port` | Cổng debug của Chrome (phải khớp với `START_TOOL.vbs`) | 9222 |
+| `response_timeout` | Thời gian chờ phản hồi tối đa (giây) | 60 |
+| `display_seconds` | Thời gian hiển thị đáp án (giây) | 15 |
+| `settle_ms` | Thời gian chờ văn bản ổn định trước khi lấy kết quả (ms) | 1500 |
+| `image_wait` | Thời gian chờ ảnh dán vào ô nhập (giây) | 10 |
+| `image_max_size` | Cạnh lớn nhất khi nén ảnh trước khi gửi (px) | 1600 |
+| `selectors` | Bộ selector DOM của Gemini (chỉ sửa khi Google đổi giao diện) | (mặc định) |
 
 ## ⚙️ Cấu hình nâng cao (Chrome Path)
 
 Nếu máy bạn cài Chrome ở vị trí khác (không phải ổ C mặc định), hãy tạo file `chrome_path.txt` cùng thư mục và dán đường dẫn file `chrome.exe` vào đó. Tool sẽ tự nhận diện.
+
+Nếu cổng `debug_port` đang bị ứng dụng khác (VS Code, Electron...) chiếm, tool sẽ báo lỗi thay vì điều khiển nhầm cửa sổ. Hãy đổi `debug_port` trong `config.json`; `START_TOOL.vbs` sẽ tự đọc cổng này.
+
+Nhật ký hoạt động được ghi xoay vòng tại `gemini_helper.log` (tối đa ~4 MB, 3 bản backup).
 
 ## ⚠️ Lưu ý
 

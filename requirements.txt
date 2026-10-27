@@ -1,6 +1,7 @@
-selenium
+selenium>=4.6
 keyboard
 pyperclip
 webdriver-manager
-pywin32
 Pillow
+requests
+websocket-client
