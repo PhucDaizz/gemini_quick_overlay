@@ -7,8 +7,8 @@
 ## ✨ Tính năng nổi bật
 
 - 🚀 **Tốc độ cao**: Tự động lấy nội dung từ Clipboard và gửi cho Gemini chỉ với 1 phím bấm.
-- �️ **Hỗ trợ HÌNH ẢNH**: Copy ảnh (hoặc chụp màn hình) -> Bấm F2 -> Tool tự gửi ảnh và yêu cầu giải.
-- �👻 **Chế độ tàng hình**: Chrome chạy ngầm hoàn toàn, không chiếm màn hình làm việc.
+- 🖼️ **Hỗ trợ HÌNH ẢNH**: Copy ảnh (hoặc chụp màn hình) -> Bấm F2 -> Tool tự gửi ảnh và yêu cầu giải.
+- 👻 **Chế độ tàng hình**: Chrome chạy ngầm hoàn toàn, không chiếm màn hình làm việc.
 - 🎨 **Giao diện trong suốt**: Kết quả hiện trên nền trong suốt, chữ đen rõ nét, không che khuất tầm nhìn.
 - ⚙️ **Tùy chỉnh mạnh mẽ**: Cho phép chỉnh màu sắc, độ mờ, font chữ và cả Prompt (câu lệnh) thông qua file `config.json`.
 - ⌨️ **Phím tắt tiện lợi**: Thao tác hoàn toàn bằng bàn phím.
@@ -25,16 +25,15 @@
 ## 📦 Cài đặt
 
 ### Cách 1: Dành cho người dùng phổ thông
-1. Tải bộ cài (Download ZIP) từ nút **Code** màu xanh ở trên và giải nén.
-2. **Bước 1:** Chạy file `START_TOOL.vbs` để bật Chrome ngầm.
-3. **Bước 2:** Chạy file `gemini_helper_v2_window_activation.exe` (hoặc tên file bạn đã đổi) để bật Tool.
-4. **Tắt Tool:** Chạy `TAT_TOOL.bat` hoặc Task Manager → End task `gemini_helper_v2_window_activation`.
+1. Vào mục **Releases** của repo, tải file `GeminiQuickOverlay-vX.Y.Z.zip` mới nhất và giải nén.
+2. Chạy file `gemini_helper_v2_window_activation.exe` (hoặc tên file bạn đã đổi). Tool tự bật Chrome ngầm khi cần; `START_TOOL.vbs` chỉ còn là cách bật Chrome thủ công.
+3. **Tắt Tool:** Chạy `TAT_TOOL.bat` hoặc Task Manager → End task `gemini_helper_v2_window_activation`.
 
 ### Cách 2: Dành cho Developer (Chạy từ Source)
 1. Clone repo này về máy:
    ```bash
-   git clone https://github.com/username/gemini-quick-overlay.git
-   cd gemini-quick-overlay
+   git clone https://github.com/PhucDaizz/gemini_quick_overlay.git
+   cd gemini_quick_overlay
    ```
 
 2. Cài đặt thư viện cần thiết:
@@ -43,8 +42,7 @@
    ```
 
 3. Chạy ứng dụng:
-   - **Bước 1:** Chạy `START_TOOL.vbs` để bật Chrome ngầm.
-   - **Bước 2:** Chạy lệnh sau để bật Tool:
+   - Chạy lệnh sau để bật Tool (Chrome được tự bật nếu chưa chạy):
      ```bash
      python gemini_helper_v2_window_activation.py
      ```
@@ -75,13 +73,15 @@ gemini_overlay/
 python -m PyInstaller --noconfirm gemini_helper_v2_window_activation.spec
 ```
 
-Sau khi build, chép `dist\gemini_helper_v2_window_activation.exe` ra thư mục gốc (cạnh `START_TOOL.vbs` và `config.json`).
+Sau khi build, chép `dist\gemini_helper_v2_window_activation.exe` ra thư mục gốc (cạnh `START_TOOL.vbs` và `config.json`). File `.exe` không được commit vào git.
+
+**Phát hành bản mới:** đẩy một tag dạng `vX.Y.Z` (`git tag v1.0.0 && git push origin v1.0.0`). GitHub Actions ([release.yml](.github/workflows/release.yml)) sẽ chạy test, build exe và đăng file ZIP lên Releases.
 
 ## 🎮 Hướng dẫn sử dụng
 
 **Bước 1: Khởi động Chrome (Nền tảng)**
-- Chạy file `START_TOOL.vbs`.
-- Chrome sẽ khởi động. Nếu là chạy lần đầu, hãy đăng nhập Gemini.
+- Tool tự bật Chrome ngầm (cổng `debug_port`, profile `profile_dir`) ở lần gửi đầu tiên nếu chưa có Chrome debug. Đặt `auto_launch_chrome` = `false` để tắt.
+- Có thể bật thủ công bằng `START_TOOL.vbs` (dùng chung cấu hình). Lần đầu hãy đăng nhập Gemini trong Chrome đó.
 
 **⛔ LƯU Ý SỐNG CÒN (QUAN TRỌNG):**
 > **KHÔNG ĐƯỢC nhấn nút (-) Minimize** để ẩn Chrome.
@@ -134,7 +134,9 @@ Bạn có thể mở file `config.json` bằng Notepad để chỉnh sửa các 
 | `position_left_offset` | Khoảng cách so với cạnh trái | 20 |
 | `prompt_text` | Câu lệnh gửi kèm khi copy Text | "chỉ trả lời..." |
 | `prompt_image` | Câu lệnh gửi kèm khi copy Ảnh | "hãy giải bài..." |
-| `debug_port` | Cổng debug của Chrome (phải khớp với `START_TOOL.vbs`) | 9222 |
+| `debug_port` | Cổng debug của Chrome | 9222 |
+| `profile_dir` | Thư mục profile Chrome (để trống = `C:\selenium\ChromeProfile`) | "" |
+| `auto_launch_chrome` | Tool tự bật Chrome nếu cổng debug chưa mở | true |
 | `page_wait` | Thời gian chờ trang Gemini sẵn sàng (giây) | 5 |
 | `response_timeout` | Thời gian chờ phản hồi tối đa (giây) | 60 |
 | `display_seconds` | Thời gian hiển thị đáp án (giây) | 15 |
