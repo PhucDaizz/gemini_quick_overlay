@@ -49,6 +49,33 @@
      python gemini_helper_v2_window_activation.py
      ```
 
+### 🗂 Cấu trúc dự án
+
+```text
+gemini_helper_v2_window_activation.py   # Entry point (giữ tương thích PyInstaller)
+gemini_overlay/
+  app.py          # Luồng chính, hotkey, clipboard
+  overlay.py      # Cửa sổ overlay Tkinter
+  automation.py   # Chọn backend CDP / Selenium
+  config.py       # Đọc config.json, hot-reload
+  constants.py    # Hằng số & giá trị mặc định
+  logging_setup.py
+  paths.py
+  win_utils.py    # DPI awareness, single-instance mutex
+  backends/
+    cdp.py        # CDP client
+    gemini_cdp.py # Automation qua CDP
+    selenium.py   # Fallback Selenium
+```
+
+### 📦 Build EXE
+
+```bash
+python -m PyInstaller --noconfirm gemini_helper_v2_window_activation.spec
+```
+
+Sau khi build, chép `dist\gemini_helper_v2_window_activation.exe` ra thư mục gốc (cạnh `START_TOOL.vbs` và `config.json`).
+
 ## 🎮 Hướng dẫn sử dụng
 
 **Bước 1: Khởi động Chrome (Nền tảng)**
@@ -121,7 +148,6 @@ Chỉ cần gửi một thư mục/ZIP gồm:
 - `START_TOOL.vbs`
 - `config.json` (tùy chọn, nên dùng bản mặc định)
 - `TAT_TOOL.bat`
-- `HUONG_DAN.txt` (nếu có)
 
 Không gửi source `.py`, `build/`, `dist/`, file log hoặc các file `.exe` cũ.
 
