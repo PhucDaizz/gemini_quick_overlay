@@ -11,7 +11,8 @@ build/
 dist/
 *.spec
 !gemini_helper_v2_window_activation.spec
-# *.exe  <-- Cho phep up file exe len git
+# exe phat hanh qua GitHub Releases (xem .github/workflows/release.yml)
+*.exe
 
 # User Configuration & Data
 chrome_path.txt
