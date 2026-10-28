@@ -71,6 +71,21 @@ chromeArgs = " --remote-debugging-port=" & debugPort & " --user-data-dir=""" & p
 WshShell.Run chr(34) & chromePath & chr(34) & chromeArgs, 0
 WScript.Sleep 3000 ' Cho 3 giay de Chrome len
 
+' --- PHAN 4: KHOI DONG TOOL (.exe) ---
+' Tool co co che chong chay trung nen chay lai nhieu lan cung an toan.
+Dim toolExe, toolScript
+toolExe = scriptDir & "\GeminiQuickOverlay.exe"
+toolScript = scriptDir & "\GeminiQuickOverlay.py"
+If fso.FileExists(toolExe) Then
+    WshShell.CurrentDirectory = scriptDir
+    WshShell.Run chr(34) & toolExe & chr(34), 0
+ElseIf fso.FileExists(toolScript) Then
+    WshShell.CurrentDirectory = scriptDir
+    WshShell.Run "pythonw " & chr(34) & toolScript & chr(34), 0
+Else
+    MsgBox "Chrome da bat nhung khong tim thay GeminiQuickOverlay.exe canh START_TOOL.vbs.", 48, "Thieu file"
+End If
+
 Set WshShell = Nothing
 Set fso = Nothing
 

@@ -27,7 +27,7 @@
 
 ### Cách 1: Dành cho người dùng phổ thông
 1. Vào mục **Releases** của repo, tải file `GeminiQuickOverlay-vX.Y.Z.zip` mới nhất và giải nén.
-2. Chạy file `GeminiQuickOverlay.exe` (hoặc tên file bạn đã đổi). Tool tự bật Chrome ngầm khi cần; `START_TOOL.vbs` chỉ còn là cách bật Chrome thủ công.
+2. Chạy file `GeminiQuickOverlay.exe` (hoặc tên file bạn đã đổi). Tool tự bật Chrome ngầm khi cần; Có thể chạy `START_TOOL.vbs` để bật cả Chrome lẫn tool chỉ bằng một cú nhấp đúp.
 3. **Tắt Tool:** Chạy `TAT_TOOL.bat` hoặc Task Manager → End task `GeminiQuickOverlay`.
 
 ### Cách 2: Dành cho Developer (Chạy từ Source)
@@ -82,7 +82,7 @@ Sau khi build, chép `dist\GeminiQuickOverlay.exe` ra thư mục gốc (cạnh `
 
 **Bước 1: Khởi động Chrome (Nền tảng)**
 - Tool tự bật Chrome ngầm (cổng `debug_port`, profile `profile_dir`) ở lần gửi đầu tiên nếu chưa có Chrome debug. Đặt `auto_launch_chrome` = `false` để tắt.
-- Có thể bật thủ công bằng `START_TOOL.vbs` (dùng chung cấu hình). Lần đầu hãy đăng nhập Gemini trong Chrome đó.
+- `START_TOOL.vbs` bật Chrome rồi bật luôn tool (nếu tool đang chạy thì không mở thêm bản thứ hai; dùng chung cấu hình). Lần đầu hãy đăng nhập Gemini trong Chrome đó.
 
 **⛔ LƯU Ý SỐNG CÒN (QUAN TRỌNG):**
 > **KHÔNG ĐƯỢC nhấn nút (-) Minimize** để ẩn Chrome.
