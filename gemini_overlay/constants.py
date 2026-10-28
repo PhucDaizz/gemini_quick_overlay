@@ -2,7 +2,11 @@ APP_NAME = "AIHelper"
 GEMINI_URL = "https://gemini.google.com/app"
 CONFIG_FILENAME = "config.json"
 LOG_FILENAME = "gemini_helper.log"
+UPDATE_STATE_FILENAME = "update_state.json"
 ICON_FILENAME = "AIHelper.ico"
+GITHUB_REPO = "PhucDaizz/gemini_quick_overlay"
+RELEASES_API_URL = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+RELEASES_PAGE_URL = f"https://github.com/{GITHUB_REPO}/releases/latest"
 MUTEX_NAME = "Local\\GeminiQuickOverlayAssistant"
 CANCELLED = "__CANCELLED__"
 HIDE = "__HIDE__"
@@ -39,6 +43,7 @@ DEFAULT_CONFIG = {
     "settle_ms": 1500,
     "debug_port": 9222,
     "auto_launch_chrome": True,
+    "check_updates": True,
     "profile_dir": "",
     "hotkey_send": "f2",
     "hotkey_replay": "f4",

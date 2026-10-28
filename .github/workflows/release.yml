@@ -24,18 +24,27 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt pyinstaller
 
+      - name: Check tag matches app version
+        shell: pwsh
+        run: |
+          $v = python -c "from gemini_overlay import __version__; print(__version__)"
+          if ("v$v" -ne "${{ github.ref_name }}") {
+            Write-Error "Tag ${{ github.ref_name }} khong khop __version__ ($v)"
+            exit 1
+          }
+
       - name: Run tests
-        run: python -m unittest tests.test_config tests.test_chrome_launcher
+        run: python -m unittest tests.test_config tests.test_chrome_launcher tests.test_update_checker
 
       - name: Build EXE
-        run: python -m PyInstaller --noconfirm gemini_helper_v2_window_activation.spec
+        run: python -m PyInstaller --noconfirm GeminiQuickOverlay.spec
 
       - name: Package
         shell: pwsh
         run: |
           $dir = "GeminiQuickOverlay-${{ github.ref_name }}"
           New-Item -ItemType Directory $dir | Out-Null
-          Copy-Item dist/gemini_helper_v2_window_activation.exe, START_TOOL.vbs, TAT_TOOL.bat, config.json $dir
+          Copy-Item dist/GeminiQuickOverlay.exe, START_TOOL.vbs, TAT_TOOL.bat, config.json $dir
           Compress-Archive -Path $dir -DestinationPath "$dir.zip"
 
       - name: Publish release

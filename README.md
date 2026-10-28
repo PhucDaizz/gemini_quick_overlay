@@ -14,6 +14,7 @@
 - ⌨️ **Phím tắt tiện lợi**: Thao tác hoàn toàn bằng bàn phím.
 - 🔧 **Tự động tìm Chrome**: Tự động dò tìm đường dẫn cài đặt Chrome trên máy.
 - ⚡ **Kết nối CDP trực tiếp**: Không cần chromedriver, khởi động nhanh; tự fallback Selenium nếu CDP không khả dụng.
+- 🔔 **Báo bản mới**: Mỗi ngày kiểm tra GitHub Releases một lần và báo trong menu tray khi có bản mới.
 - 🧩 **Chống chạy trùng**: Tự phát hiện instance đang chạy; ghi log xoay vòng ra `gemini_helper.log`.
 
 ## 🛠 Yêu cầu hệ thống
@@ -26,8 +27,8 @@
 
 ### Cách 1: Dành cho người dùng phổ thông
 1. Vào mục **Releases** của repo, tải file `GeminiQuickOverlay-vX.Y.Z.zip` mới nhất và giải nén.
-2. Chạy file `gemini_helper_v2_window_activation.exe` (hoặc tên file bạn đã đổi). Tool tự bật Chrome ngầm khi cần; `START_TOOL.vbs` chỉ còn là cách bật Chrome thủ công.
-3. **Tắt Tool:** Chạy `TAT_TOOL.bat` hoặc Task Manager → End task `gemini_helper_v2_window_activation`.
+2. Chạy file `GeminiQuickOverlay.exe` (hoặc tên file bạn đã đổi). Tool tự bật Chrome ngầm khi cần; `START_TOOL.vbs` chỉ còn là cách bật Chrome thủ công.
+3. **Tắt Tool:** Chạy `TAT_TOOL.bat` hoặc Task Manager → End task `GeminiQuickOverlay`.
 
 ### Cách 2: Dành cho Developer (Chạy từ Source)
 1. Clone repo này về máy:
@@ -44,13 +45,13 @@
 3. Chạy ứng dụng:
    - Chạy lệnh sau để bật Tool (Chrome được tự bật nếu chưa chạy):
      ```bash
-     python gemini_helper_v2_window_activation.py
+     python GeminiQuickOverlay.py
      ```
 
 ### 🗂 Cấu trúc dự án
 
 ```text
-gemini_helper_v2_window_activation.py   # Entry point (giữ tương thích PyInstaller)
+GeminiQuickOverlay.py   # Entry point (giữ tương thích PyInstaller)
 gemini_overlay/
   app.py          # Luồng chính, hotkey, clipboard
   overlay.py      # Cửa sổ overlay Tkinter
@@ -70,10 +71,10 @@ gemini_overlay/
 ### 📦 Build EXE
 
 ```bash
-python -m PyInstaller --noconfirm gemini_helper_v2_window_activation.spec
+python -m PyInstaller --noconfirm GeminiQuickOverlay.spec
 ```
 
-Sau khi build, chép `dist\gemini_helper_v2_window_activation.exe` ra thư mục gốc (cạnh `START_TOOL.vbs` và `config.json`). File `.exe` không được commit vào git.
+Sau khi build, chép `dist\GeminiQuickOverlay.exe` ra thư mục gốc (cạnh `START_TOOL.vbs` và `config.json`). File `.exe` không được commit vào git.
 
 **Phát hành bản mới:** đẩy một tag dạng `vX.Y.Z` (`git tag v1.0.0 && git push origin v1.0.0`). GitHub Actions ([release.yml](.github/workflows/release.yml)) sẽ chạy test, build exe và đăng file ZIP lên Releases.
 
@@ -112,12 +113,12 @@ Các phím trên có thể đổi trong `config.json` qua `hotkey_send`, `hotkey
 
 **Tray icon**
 - Icon tray, icon cửa sổ và icon file exe đều lấy từ `AIHelper.ico`.
-- Menu tray có: Hiện đáp án, Copy đáp án, Khởi động lại, Thoát.
+- Menu tray có: Hiện đáp án, Copy đáp án, Kiểm tra cập nhật, Khởi động lại, Thoát. Khi có bản mới sẽ xuất hiện thêm mục "Có bản mới … - Tải về".
 - Nhấn đúp vào icon tray để hiện lại đáp án gần nhất.
 
 **Tắt Tool**
 - Chạy `TAT_TOOL.bat` để tắt tool đang chạy (Chrome vẫn mở).
-- Hoặc mở Task Manager → tìm `gemini_helper_v2_window_activation` → End task.
+- Hoặc mở Task Manager → tìm `GeminiQuickOverlay` → End task.
 - Nếu bạn đổi tên file `.exe`, sửa lại tên tương ứng trong `TAT_TOOL.bat`.
 
 ## ⚙️ Tùy chỉnh (File `config.json`)
@@ -136,6 +137,7 @@ Bạn có thể mở file `config.json` bằng Notepad để chỉnh sửa các 
 | `prompt_image` | Câu lệnh gửi kèm khi copy Ảnh | "hãy giải bài..." |
 | `debug_port` | Cổng debug của Chrome | 9222 |
 | `profile_dir` | Thư mục profile Chrome (để trống = `C:\selenium\ChromeProfile`) | "" |
+| `check_updates` | Tự kiểm tra bản mới trên GitHub Releases (tối đa mỗi ngày 1 lần) | true |
 | `auto_launch_chrome` | Tool tự bật Chrome nếu cổng debug chưa mở | true |
 | `page_wait` | Thời gian chờ trang Gemini sẵn sàng (giây) | 5 |
 | `response_timeout` | Thời gian chờ phản hồi tối đa (giây) | 60 |
@@ -161,7 +163,7 @@ Nhật ký hoạt động được ghi xoay vòng tại `gemini_helper.log` (t�
 ## 📤 Chia sẻ cho người dùng phổ thông
 
 Chỉ cần gửi một thư mục/ZIP gồm:
-- `gemini_helper_v2_window_activation.exe`
+- `GeminiQuickOverlay.exe`
 - `START_TOOL.vbs`
 - `config.json` (tùy chọn, nên dùng bản mặc định)
 - `TAT_TOOL.bat`

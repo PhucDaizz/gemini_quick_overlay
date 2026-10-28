@@ -18,6 +18,7 @@ from .events import msg_queue
 from .logging_setup import log, setup_logging
 from .overlay import OverlayWindow
 from .paths import APP_DIR
+from .update_checker import check_for_update
 from .tray import TrayController
 from .win_utils import (
     acquire_single_instance,
@@ -167,7 +168,7 @@ def _launch_restart():
     if getattr(sys, "frozen", False):
         args = [sys.executable]
     else:
-        entry = os.path.join(APP_DIR, "gemini_helper_v2_window_activation.py")
+        entry = os.path.join(APP_DIR, "GeminiQuickOverlay.py")
         args = [sys.executable, entry]
     try:
         subprocess.Popen(args, cwd=APP_DIR)
@@ -205,13 +206,32 @@ def main():
         restart_requested["value"] = True
         window.request_quit()
 
+    def run_update_check(force=False):
+        try:
+            found = check_for_update(force=force)
+        except Exception:
+            if force:
+                msg_queue.put(("Không kiểm tra được cập nhật (mất mạng?).", 4))
+            return
+        if found:
+            tag, url = found
+            tray.set_update(tag, url)
+            msg_queue.put((f"Có bản mới {tag}. Mở menu tray để tải về.", 6))
+        elif force:
+            msg_queue.put(("Bạn đang dùng bản mới nhất.", 3))
+
     tray = TrayController(
         on_show=lambda: commands.put("replay"),
         on_copy=lambda: commands.put("copy"),
         on_quit=window.request_quit,
         on_restart=request_restart,
+        on_check_update=lambda: Thread(
+            target=run_update_check, args=(True,), daemon=True
+        ).start(),
     )
     tray.start()
+    if get_config().get("check_updates", True):
+        Thread(target=run_update_check, daemon=True).start()
     try:
         window.run()
     finally:

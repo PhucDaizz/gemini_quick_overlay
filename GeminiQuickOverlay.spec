@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['gemini_helper_v2_window_activation.py'],
+    ['GeminiQuickOverlay.py'],
     pathex=[],
     binaries=[],
     datas=[('AIHelper.ico', '.')],
@@ -22,7 +22,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='gemini_helper_v2_window_activation',
+    name='GeminiQuickOverlay',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
