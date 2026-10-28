@@ -38,6 +38,8 @@ DEFAULT_CONFIG = {
     "poll_interval": 0.35,
     "settle_ms": 1500,
     "debug_port": 9222,
+    "auto_launch_chrome": True,
+    "profile_dir": "",
     "hotkey_send": "f2",
     "hotkey_replay": "f4",
     "hotkey_copy": "f3",

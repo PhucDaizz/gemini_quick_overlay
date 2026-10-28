@@ -1,6 +1,7 @@
 import threading
 
 from .backends import CDPAutomation, CDPUnavailable, SeleniumAutomation
+from .chrome_launcher import ensure_chrome
 from .config import get_config
 from .logging_setup import log
 
@@ -28,7 +29,13 @@ class Automation:
                     self._close_backend()
             if self._fatal:
                 return False
-            port = int(self._cfg().get("debug_port", 9222))
+            cfg = self._cfg()
+            port = int(cfg.get("debug_port", 9222))
+            launch_error = ensure_chrome(cfg)
+            if launch_error:
+                self._last_error = launch_error
+                log.error("%s", launch_error)
+                return False
             try:
                 self._backend = CDPAutomation(port, config_provider=self._config_provider)
                 self._kind = "cdp"

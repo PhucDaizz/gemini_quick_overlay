@@ -1,6 +1,6 @@
 Option Explicit
 
-Dim WshShell, fso, chromePath, scriptDir, debugPort
+Dim WshShell, fso, chromePath, scriptDir, debugPort, profileDir
 Set WshShell = CreateObject("WScript.Shell")
 Set fso = CreateObject("Scripting.FileSystemObject")
 
@@ -42,6 +42,7 @@ End If
 
 ' --- PHAN 2: DOC DEBUG PORT TU config.json ---
 debugPort = 9222
+profileDir = "C:\selenium\ChromeProfile"
 If fso.FileExists(scriptDir & "\config.json") Then
     Dim cfgFile, cfgText, cfgRegex, cfgMatches
     Set cfgFile = fso.OpenTextFile(scriptDir & "\config.json", 1)
@@ -54,12 +55,17 @@ If fso.FileExists(scriptDir & "\config.json") Then
         Set cfgMatches = cfgRegex.Execute(cfgText)
         debugPort = CLng(cfgMatches(0).SubMatches(0))
     End If
+    cfgRegex.Pattern = """profile_dir""\s*:\s*""([^""]+)"""
+    If cfgRegex.Test(cfgText) Then
+        Set cfgMatches = cfgRegex.Execute(cfgText)
+        profileDir = Replace(cfgMatches(0).SubMatches(0), "\\", "\")
+    End If
 End If
 
 ' --- PHAN 3: KHOI DONG CHROME AN (BACKGROUND) ---
 ' Tham so khoi dong Chrome Debug + Anti-Sleep
 Dim chromeArgs
-chromeArgs = " --remote-debugging-port=" & debugPort & " --user-data-dir=""C:\selenium\ChromeProfile"" --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding"
+chromeArgs = " --remote-debugging-port=" & debugPort & " --user-data-dir=""" & profileDir & """ --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding"
 
 ' Chay Chrome an (WindowStyle = 0)
 WshShell.Run chr(34) & chromePath & chr(34) & chromeArgs, 0
