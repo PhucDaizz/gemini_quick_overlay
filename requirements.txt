@@ -3,5 +3,6 @@ keyboard
 pyperclip
 webdriver-manager
 Pillow
+pystray>=0.19
 requests
 websocket-client

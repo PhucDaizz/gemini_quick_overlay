@@ -20,7 +20,12 @@ class Automation:
     def _ensure(self):
         with self._lock:
             if self._backend is not None:
-                return True
+                try:
+                    self._backend.ensure_ready()
+                    return True
+                except Exception as e:
+                    log.warning("Mất kết nối backend (%s), thử kết nối lại.", e)
+                    self._close_backend()
             if self._fatal:
                 return False
             port = int(self._cfg().get("debug_port", 9222))
@@ -64,13 +69,19 @@ class Automation:
             except Exception:
                 pass
 
+    def close(self):
+        self._reset()
+
+    def _close_backend(self):
+        if self._backend is not None:
+            try:
+                self._backend.close()
+            except Exception:
+                pass
+        self._backend = None
+        self._kind = None
+
     def _reset(self):
         with self._lock:
-            if self._backend is not None:
-                try:
-                    self._backend.close()
-                except Exception:
-                    pass
-            self._backend = None
-            self._kind = None
+            self._close_backend()
 

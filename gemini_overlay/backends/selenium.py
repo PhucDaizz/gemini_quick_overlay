@@ -34,6 +34,11 @@ class SeleniumAutomation:
         provider = self._config_provider or get_config
         return provider()
 
+    def ensure_ready(self):
+        if self.driver is None:
+            raise RuntimeError("Selenium đã đóng.")
+        self.driver.current_url
+
     def close(self):
         self.driver = None
 

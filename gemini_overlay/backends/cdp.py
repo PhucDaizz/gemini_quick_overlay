@@ -152,6 +152,12 @@ class CDPClient:
                 future = self._pending.pop(msg_id, None)
             if future and not future.done():
                 future.set_result(data)
+        self._closed.set()
+        try:
+            if self.ws is not None:
+                self.ws.close()
+        except Exception:
+            pass
         with self._lock:
             pending = list(self._pending.values())
             self._pending.clear()

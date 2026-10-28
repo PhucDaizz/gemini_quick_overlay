@@ -28,3 +28,14 @@ def acquire_single_instance():
         return handle
     except Exception:
         return True
+
+
+def release_single_instance(handle):
+    if not handle or handle is True:
+        return
+    try:
+        kernel32 = ctypes.windll.kernel32
+        kernel32.CloseHandle.argtypes = (ctypes.c_void_p,)
+        kernel32.CloseHandle(handle)
+    except Exception:
+        pass

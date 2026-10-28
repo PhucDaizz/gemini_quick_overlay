@@ -61,6 +61,7 @@ gemini_overlay/
   constants.py    # Hằng số & giá trị mặc định
   logging_setup.py
   paths.py
+  tray.py         # Tray icon
   win_utils.py    # DPI awareness, single-instance mutex
   backends/
     cdp.py        # CDP client
@@ -103,8 +104,16 @@ Sau khi build, chép `dist\gemini_helper_v2_window_activation.exe` ra thư mục
 | Phím | Chức năng |
 |------|-----------|
 | **F2** | **GỬI (AUTO)**: Tự phát hiện Text hoặc Ảnh trong Clipboard để gửi đi. |
-| **F4** | **XEM LẠI**: Hiển thị lại đáp án cũ trong 2 giây. |
+| **F3** | **COPY ĐÁP ÁN**: Copy đáp án gần nhất vào clipboard (không hiện overlay). |
+| **F4** | **XEM LẠI**: Hiển thị lại đáp án gần nhất theo `display_seconds`. |
 | **ESC** | **ẨN NGAY**: Tắt ngay lập tức lớp phủ đáp án. |
+
+Các phím trên có thể đổi trong `config.json` qua `hotkey_send`, `hotkey_copy`, `hotkey_replay`, `hotkey_hide`.
+
+**Tray icon**
+- Icon tray, icon cửa sổ và icon file exe đều lấy từ `AIHelper.ico`.
+- Menu tray có: Hiện đáp án, Copy đáp án, Khởi động lại, Thoát.
+- Nhấn đúp vào icon tray để hiện lại đáp án gần nhất.
 
 **Tắt Tool**
 - Chạy `TAT_TOOL.bat` để tắt tool đang chạy (Chrome vẫn mở).
@@ -126,11 +135,17 @@ Bạn có thể mở file `config.json` bằng Notepad để chỉnh sửa các 
 | `prompt_text` | Câu lệnh gửi kèm khi copy Text | "chỉ trả lời..." |
 | `prompt_image` | Câu lệnh gửi kèm khi copy Ảnh | "hãy giải bài..." |
 | `debug_port` | Cổng debug của Chrome (phải khớp với `START_TOOL.vbs`) | 9222 |
+| `page_wait` | Thời gian chờ trang Gemini sẵn sàng (giây) | 5 |
 | `response_timeout` | Thời gian chờ phản hồi tối đa (giây) | 60 |
 | `display_seconds` | Thời gian hiển thị đáp án (giây) | 15 |
 | `settle_ms` | Thời gian chờ văn bản ổn định trước khi lấy kết quả (ms) | 1500 |
 | `image_wait` | Thời gian chờ ảnh dán vào ô nhập (giây) | 10 |
 | `image_max_size` | Cạnh lớn nhất khi nén ảnh trước khi gửi (px) | 1600 |
+| `hotkey_send` | Phím gửi | "f2" |
+| `hotkey_copy` | Phím copy đáp án | "f3" |
+| `hotkey_replay` | Phím xem lại đáp án | "f4" |
+| `hotkey_hide` | Phím ẩn overlay | "esc" |
+| `show_pending` | Hiện "..." khoảng 2 giây để xác nhận đã nhận câu hỏi (không hiện trạng thái chờ/streaming); đặt `false` để tắt | true |
 | `selectors` | Bộ selector DOM của Gemini (chỉ sửa khi Google đổi giao diện) | (mặc định) |
 
 ## ⚙️ Cấu hình nâng cao (Chrome Path)

@@ -36,6 +36,14 @@ class CDPAutomation:
         client.connect(self._target_match)
         self.client = client
 
+    def ensure_ready(self):
+        client = self.client
+        if client is not None and not client.closed:
+            if client.try_eval("1", timeout=1.5) is not None:
+                return
+            client.close()
+        self._ensure_client()
+
     def _cfg(self):
         if self.config_override is not None:
             return self.config_override
@@ -56,7 +64,9 @@ class CDPAutomation:
     @staticmethod
     def _probe_js(selector):
         return (
-            "(function(){const n=document.querySelectorAll(%s);"
+            "(function(){const all=Array.from(document.querySelectorAll(%s));"
+            "const vis=all.filter(e=>e.getClientRects().length);"
+            "const n=vis.length?vis:all;"
             "if(!n.length)return{count:0,text:''};"
             "const e=n[n.length-1];"
             "return{count:n.length,text:(e.innerText||'').trim()};})()"
@@ -97,6 +107,18 @@ class CDPAutomation:
             "(function(){const b=document.querySelector(%s);"
             "return !!(b&&!b.disabled);})()"
         ) % json.dumps(selector)
+
+    @staticmethod
+    def _status_js(input_selector, send_selector):
+        return (
+            "(function(){"
+            "const input=document.querySelector(%s);"
+            "const send=document.querySelector(%s);"
+            "const url=location.href;"
+            "const signedOut=/accounts\\.google\\.com|servicelogin/i.test(url);"
+            "return{url:url,input:!!input,send:!!send,signedOut:signedOut};"
+            "})()"
+        ) % (json.dumps(input_selector), json.dumps(send_selector))
 
     @staticmethod
     def _preview_count_js(selector):
@@ -145,7 +167,9 @@ class CDPAutomation:
           let done=false;
           let observer=null;
           function current(){
-            const nodes=document.querySelectorAll(cfg.response);
+            const all=Array.from(document.querySelectorAll(cfg.response));
+            const vis=all.filter(e=>e.getClientRects().length);
+            const nodes=vis.length?vis:all;
             if(!nodes.length)return{count:0,text:''};
             const el=nodes[nodes.length-1];
             return{count:nodes.length,text:(el.innerText||'').trim()};
@@ -273,7 +297,33 @@ class CDPAutomation:
         cfg = self._cfg()
         selectors = cfg["selectors"]
         try:
-            self._ensure_client()
+            self.ensure_ready()
+            status = None
+            deadline = time.time() + float(cfg.get("page_wait", 5.0))
+            while time.time() < deadline:
+                try:
+                    status = self.client.eval(
+                        self._status_js(selectors["input"], selectors["send"]),
+                        timeout=5,
+                    )
+                except Exception as e:
+                    log.debug("Trang Gemini chưa sẵn sàng: %s", e)
+                    status = None
+                    time.sleep(0.2)
+                    continue
+                if isinstance(status, dict) and (
+                    status.get("input") or status.get("signedOut")
+                ):
+                    break
+                time.sleep(0.2)
+            if isinstance(status, dict):
+                if status.get("signedOut"):
+                    return "Lỗi: Chưa đăng nhập Gemini. Hãy đăng nhập trong tab Chrome."
+                if not status.get("input"):
+                    return (
+                        "Lỗi: Không tìm thấy ô nhập Gemini. Có thể chưa đăng nhập "
+                        "hoặc giao diện đã đổi (kiểm tra selectors.input)."
+                    )
             self.client.eval("window.__geminiCancel=false;true", timeout=5)
             initial_count, initial_text = self._probe(selectors["response"])
             if initial_count and not initial_text:
@@ -294,8 +344,14 @@ class CDPAutomation:
             else:
                 self._insert_text(selectors["input"], text)
 
-            self._wait_send_ready(selectors["send"], 3)
-            if not self.client.eval(self._send_js(selectors["send"]), timeout=5):
+            send_clicked = False
+            if isinstance(status, dict) and status.get("send"):
+                self._wait_send_ready(selectors["send"], 3)
+                send_clicked = bool(
+                    self.client.eval(self._send_js(selectors["send"]), timeout=5)
+                )
+            if not send_clicked:
+                log.warning("Không bấm được nút gửi, thử Enter.")
                 self.client.send(
                     "Input.dispatchKeyEvent",
                     {"type": "rawKeyDown", "key": "Enter", "code": "Enter",
@@ -328,7 +384,10 @@ class CDPAutomation:
                 return str(result.get("text") or "").strip()
             if status == "cancelled":
                 return CANCELLED
-            return "Không lấy được phản hồi mới (Hết thời gian chờ)."
+            return (
+                "Không lấy được phản hồi mới (hết thời gian). "
+                "Kiểm tra selectors.response hoặc trạng thái Gemini."
+            )
         except Exception as e:
             log.exception("Lỗi CDP khi tương tác")
             self.close()

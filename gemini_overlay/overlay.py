@@ -1,17 +1,30 @@
 import queue
+import threading
 import tkinter as tk
 
 from .config import get_config
-from .constants import HIDE
+from .constants import APP_NAME, HIDE
 from .events import msg_queue
+from .paths import ICON_PATH
 
 
 class OverlayWindow:
     def __init__(self):
         cfg = get_config()
         self.root = tk.Tk()
+        self.root.title(APP_NAME)
         self.root.overrideredirect(True)
         self.root.attributes("-topmost", True)
+        self._icon_photo = None
+        try:
+            from PIL import Image, ImageTk
+
+            with Image.open(ICON_PATH) as image:
+                image.thumbnail((256, 256), Image.LANCZOS)
+                self._icon_photo = ImageTk.PhotoImage(image.copy())
+            self.root.iconphoto(True, self._icon_photo)
+        except Exception:
+            pass
 
         transparent_color = cfg["background_color"]
         self.root.configure(bg=transparent_color)
@@ -36,11 +49,21 @@ class OverlayWindow:
         self.root.withdraw()
 
         self.hide_timer = None
+        self._stop_event = threading.Event()
 
         self.root.after(100, self.check_queue)
+
+    def run(self):
         self.root.mainloop()
 
+    def request_quit(self):
+        self._stop_event.set()
+
     def check_queue(self):
+        if self._stop_event.is_set():
+            self.root.destroy()
+            return
+
         while True:
             try:
                 item = msg_queue.get_nowait()
@@ -98,4 +121,6 @@ class OverlayWindow:
 
 
 def run_overlay():
-    OverlayWindow()
+    window = OverlayWindow()
+    window.run()
+    return window
