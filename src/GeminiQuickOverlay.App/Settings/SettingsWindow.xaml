@@ -257,10 +257,15 @@
             </TabItem>
         </TabControl>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
-            <Button Content="Hủy" MinWidth="96" Margin="0,0,8,0" IsCancel="True" />
-            <Button Content="Lưu" MinWidth="96" IsDefault="True" Style="{DynamicResource AccentButtonStyle}" Click="Save_Click" />
-        </StackPanel>
+        <Grid Grid.Row="2" Margin="0,14,0,0">
+            <TextBlock Style="{StaticResource Hint}" VerticalAlignment="Center" HorizontalAlignment="Left">
+                <Run Text="Made by " /><Hyperlink NavigateUri="https://github.com/PhucDaizz" RequestNavigate="Author_RequestNavigate">PhucDaizz</Hyperlink>
+            </TextBlock>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Hủy" MinWidth="96" Margin="0,0,8,0" IsCancel="True" />
+                <Button Content="Lưu" MinWidth="96" IsDefault="True" Style="{DynamicResource AccentButtonStyle}" Click="Save_Click" />
+            </StackPanel>
+        </Grid>
 
         <Popup x:Name="ColorPopup" StaysOpen="False" AllowsTransparency="True" Placement="Bottom" PopupAnimation="Fade">
             <Border x:Name="ColorPopupBorder" Padding="12" CornerRadius="8" BorderThickness="1" BorderBrush="#55808080" Margin="0,4,0,0">

@@ -110,6 +110,12 @@ public partial class SettingsWindow : Window
         }
     }
 
+    private void Author_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+    {
+        OpenPath(e.Uri.AbsoluteUri, "Could not open the link.");
+        e.Handled = true;
+    }
+
     private void BrowseProfile_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new Microsoft.Win32.OpenFolderDialog
