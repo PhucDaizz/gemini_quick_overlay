@@ -28,7 +28,15 @@ public partial class OverlayWindow : Window
     public void ApplyConfig()
     {
         var config = _config.Current;
-        MessageText.Foreground = ParseBrush(config.TextColor);
+        var foreground = ParseBrush(config.TextColor);
+        MessageText.Foreground = foreground;
+        if (MessageText.Effect is System.Windows.Media.Effects.DropShadowEffect halo &&
+            foreground is SolidColorBrush solid)
+        {
+            // Dark text gets a light halo and light text a dark one, so it never blends into its own glow.
+            var luminance = (0.299 * solid.Color.R + 0.587 * solid.Color.G + 0.114 * solid.Color.B) / 255;
+            halo.Color = luminance < 0.5 ? Colors.White : Colors.Black;
+        }
         MessageText.FontSize = Math.Clamp(config.FontSize, 8, 72);
         MessageText.MaxWidth = Math.Clamp(config.WrapLength, 200, 4096);
         MessageText.LineHeight = Math.Max(12, MessageText.FontSize * 1.35);

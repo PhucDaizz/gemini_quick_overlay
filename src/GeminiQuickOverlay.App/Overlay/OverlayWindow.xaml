@@ -13,15 +13,23 @@
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="Manual"
         Visibility="Hidden"
-        Opacity="0.5">
-    <Border x:Name="MessageBorder" Padding="8" Background="Transparent">
+        Opacity="0.5"
+        ThemeMode="None">
+    <Border x:Name="MessageBorder" Padding="10,8" Background="Transparent">
         <TextBlock x:Name="MessageText"
                    Text=""
-                   FontFamily="Arial"
-                   FontWeight="Bold"
+                   FontFamily="Segoe UI"
+                   FontWeight="SemiBold"
                    Foreground="Black"
                    TextWrapping="Wrap"
                    LineHeight="19"
-                   MaxWidth="800" />
+                   MaxWidth="800"
+                   TextOptions.TextFormattingMode="Display"
+                   TextOptions.TextRenderingMode="ClearType">
+            <!-- Soft light halo keeps dark text legible over dark content without a solid box. -->
+            <TextBlock.Effect>
+                <DropShadowEffect Color="White" ShadowDepth="0" BlurRadius="6" Opacity="0.85" />
+            </TextBlock.Effect>
+        </TextBlock>
     </Border>
 </Window>

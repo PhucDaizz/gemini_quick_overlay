@@ -2,190 +2,271 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:hotkeys="clr-namespace:GeminiQuickOverlay.App.Hotkeys"
-        Title="Cài đặt - AIHelper"
-        Width="760"
-        Height="700"
-        MinWidth="640"
-        MinHeight="560"
+        Title="Cài đặt - Gemini Quick Overlay"
+        Width="780"
+        Height="720"
+        MinWidth="680"
+        MinHeight="580"
         WindowStartupLocation="CenterScreen"
         ShowInTaskbar="True">
-    <Grid Margin="12">
+    <Grid Margin="20,16,20,16">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TabControl Grid.Row="0">
+        <StackPanel Grid.Row="0" Margin="0,0,0,12">
+            <TextBlock Text="Cài đặt" FontSize="24" FontWeight="SemiBold" />
+            <TextBlock Style="{StaticResource Hint}" Margin="0,2,0,0"
+                       Text="Thay đổi được áp dụng ngay sau khi bấm Lưu." />
+        </StackPanel>
+
+        <TabControl Grid.Row="1">
             <TabItem Header="Chung">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="12">
-                        <TextBlock Text="Prompt khi gửi văn bản" FontWeight="SemiBold" />
-                        <TextBox x:Name="PromptTextTextBox" AcceptsReturn="True" TextWrapping="Wrap" Height="64" Margin="0,4,0,12" />
+                    <StackPanel Margin="0,12,8,0">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Prompt" Style="{StaticResource CardTitle}" />
+                                <TextBlock Text="Khi gửi văn bản" Style="{StaticResource FieldLabel}" />
+                                <TextBox x:Name="PromptTextTextBox" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="64" Margin="0,0,0,14" />
+                                <TextBlock Text="Khi gửi ảnh" Style="{StaticResource FieldLabel}" />
+                                <TextBox x:Name="PromptImageTextBox" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="64" />
+                            </StackPanel>
+                        </Border>
 
-                        <TextBlock Text="Prompt khi gửi ảnh" FontWeight="SemiBold" />
-                        <TextBox x:Name="PromptImageTextBox" AcceptsReturn="True" TextWrapping="Wrap" Height="64" Margin="0,4,0,12" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Thời gian chờ" Style="{StaticResource CardTitle}" />
+                                <UniformGrid Columns="3">
+                                    <StackPanel>
+                                        <TextBlock Text="Hiện đáp án (giây)" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="DisplaySecondsBox" Style="{StaticResource NumberBox}" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="Chờ phản hồi (giây)" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="ResponseTimeoutBox" Style="{StaticResource NumberBox}" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="Chờ trang Gemini (giây)" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="PageWaitBox" Style="{StaticResource NumberBox}" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="Chờ dán ảnh (giây)" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="ImageWaitBox" Style="{StaticResource NumberBox}" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="Cạnh ảnh tối đa (px)" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="ImageMaxSizeBox" Style="{StaticResource NumberBox}" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="Văn bản ổn định (ms)" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="SettleMsBox" Style="{StaticResource NumberBox}" />
+                                    </StackPanel>
+                                </UniformGrid>
+                            </StackPanel>
+                        </Border>
 
-                        <UniformGrid Columns="2">
-                            <StackPanel Margin="0,0,8,10">
-                                <TextBlock Text="Thời gian hiện đáp án (giây)" />
-                                <TextBox x:Name="DisplaySecondsBox" Width="140" HorizontalAlignment="Left" Margin="0,4,0,0" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Hành vi" Style="{StaticResource CardTitle}" />
+                                <CheckBox x:Name="ShowPendingCheck" Content="Hiện &quot;...&quot; để xác nhận đã nhận câu hỏi" Margin="0,0,0,8" />
+                                <CheckBox x:Name="CheckUpdatesCheck" Content="Tự kiểm tra bản mới trên GitHub mỗi ngày" Margin="0,0,0,8" />
+                                <CheckBox x:Name="AutoLaunchCheck" Content="Tự bật Chrome nếu cổng debug chưa mở" />
                             </StackPanel>
-                            <StackPanel Margin="8,0,0,10">
-                                <TextBlock Text="Chờ phản hồi tối đa (giây)" />
-                                <TextBox x:Name="ResponseTimeoutBox" Width="140" HorizontalAlignment="Left" Margin="0,4,0,0" />
-                            </StackPanel>
-                            <StackPanel Margin="0,0,8,10">
-                                <TextBlock Text="Chờ trang Gemini sẵn sàng (giây)" />
-                                <TextBox x:Name="PageWaitBox" Width="140" HorizontalAlignment="Left" Margin="0,4,0,0" />
-                            </StackPanel>
-                            <StackPanel Margin="8,0,0,10">
-                                <TextBlock Text="Chờ ảnh dán vào ô nhập (giây)" />
-                                <TextBox x:Name="ImageWaitBox" Width="140" HorizontalAlignment="Left" Margin="0,4,0,0" />
-                            </StackPanel>
-                            <StackPanel Margin="0,0,8,10">
-                                <TextBlock Text="Cạnh lớn nhất của ảnh (px)" />
-                                <TextBox x:Name="ImageMaxSizeBox" Width="140" HorizontalAlignment="Left" Margin="0,4,0,0" />
-                            </StackPanel>
-                            <StackPanel Margin="8,0,0,10">
-                                <TextBlock Text="Chờ văn bản ổn định (ms)" />
-                                <TextBox x:Name="SettleMsBox" Width="140" HorizontalAlignment="Left" Margin="0,4,0,0" />
-                            </StackPanel>
-                        </UniformGrid>
-
-                        <CheckBox x:Name="ShowPendingCheck" Content="Hiện &quot;...&quot; khoảng 2 giây để xác nhận đã nhận câu hỏi" Margin="0,8,0,4" />
-                        <CheckBox x:Name="CheckUpdatesCheck" Content="Tự kiểm tra bản mới trên GitHub mỗi ngày" Margin="0,4" />
-                        <CheckBox x:Name="AutoLaunchCheck" Content="Tự bật Chrome nếu cổng debug chưa mở" Margin="0,4" />
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
             <TabItem Header="Giao diện">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="12">
-                        <UniformGrid Columns="2">
-                            <StackPanel Margin="0,0,8,10">
-                                <TextBlock Text="Màu chữ (tên hoặc #hex)" />
-                                <TextBox x:Name="TextColorBox" Width="180" HorizontalAlignment="Left" Margin="0,4,0,0" TextChanged="AppearanceChanged" />
+                    <StackPanel Margin="0,12,8,0">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Chữ" Style="{StaticResource CardTitle}" />
+                                <UniformGrid Columns="3">
+                                    <StackPanel>
+                                        <TextBlock Text="Màu chữ (tên hoặc #hex)" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="TextColorBox" Style="{StaticResource NumberBox}" TextChanged="AppearanceChanged" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="Cỡ chữ" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="FontSizeBox" Style="{StaticResource NumberBox}" TextChanged="AppearanceChanged" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="Độ rộng tối đa (px)" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="WrapLengthBox" Style="{StaticResource NumberBox}" TextChanged="AppearanceChanged" />
+                                    </StackPanel>
+                                </UniformGrid>
+                                <TextBlock Text="Màu nền cũ (giữ tương thích với config.json)" Style="{StaticResource FieldLabel}" />
+                                <TextBox x:Name="BackgroundColorBox" Style="{StaticResource NumberBox}" Margin="0" />
                             </StackPanel>
-                            <StackPanel Margin="8,0,0,10">
-                                <TextBlock Text="Màu nền cũ (giữ tương thích)" />
-                                <TextBox x:Name="BackgroundColorBox" Width="180" HorizontalAlignment="Left" Margin="0,4,0,0" />
-                            </StackPanel>
-                            <StackPanel Margin="0,0,8,10">
-                                <TextBlock Text="Cỡ chữ" />
-                                <TextBox x:Name="FontSizeBox" Width="140" HorizontalAlignment="Left" Margin="0,4,0,0" TextChanged="AppearanceChanged" />
-                            </StackPanel>
-                            <StackPanel Margin="8,0,0,10">
-                                <TextBlock Text="Độ rộng tối đa (wrap_length)" />
-                                <TextBox x:Name="WrapLengthBox" Width="140" HorizontalAlignment="Left" Margin="0,4,0,0" TextChanged="AppearanceChanged" />
-                            </StackPanel>
-                            <StackPanel Margin="0,0,8,10">
-                                <TextBlock Text="Cách trái (px)" />
-                                <TextBox x:Name="LeftOffsetBox" Width="140" HorizontalAlignment="Left" Margin="0,4,0,0" />
-                            </StackPanel>
-                            <StackPanel Margin="8,0,0,10">
-                                <TextBlock Text="Cách đáy (px)" />
-                                <TextBox x:Name="BottomOffsetBox" Width="140" HorizontalAlignment="Left" Margin="0,4,0,0" />
-                            </StackPanel>
-                        </UniformGrid>
+                        </Border>
 
-                        <TextBlock Text="Độ mờ" Margin="0,8,0,0" />
-                        <Grid Margin="0,4,0,12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="80" />
-                            </Grid.ColumnDefinitions>
-                            <Slider x:Name="OpacitySlider" Minimum="0.1" Maximum="1" TickFrequency="0.05" ValueChanged="OpacityChanged" />
-                            <TextBlock x:Name="OpacityLabel" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" />
-                        </Grid>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Vị trí và độ mờ" Style="{StaticResource CardTitle}" />
+                                <UniformGrid Columns="3">
+                                    <StackPanel>
+                                        <TextBlock Text="Cách trái (px)" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="LeftOffsetBox" Style="{StaticResource NumberBox}" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="Cách đáy (px)" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="BottomOffsetBox" Style="{StaticResource NumberBox}" />
+                                    </StackPanel>
+                                </UniformGrid>
+                                <TextBlock Text="Độ mờ" Style="{StaticResource FieldLabel}" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="64" />
+                                    </Grid.ColumnDefinitions>
+                                    <Slider x:Name="OpacitySlider" Minimum="0.1" Maximum="1" TickFrequency="0.05" ValueChanged="OpacityChanged" />
+                                    <TextBlock x:Name="OpacityLabel" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
 
-                        <TextBlock Text="Xem trước" FontWeight="SemiBold" />
-                        <Border x:Name="PreviewBorder" Background="#333333" CornerRadius="6" Padding="12" Margin="0,4,0,0">
-                            <TextBlock x:Name="PreviewText"
-                                       Text="Đây là đáp án xem trước. Chữ sẽ hiện trên nền trong suốt khi chạy."
-                                       TextWrapping="Wrap"
-                                       Foreground="Black"
-                                       FontFamily="Arial"
-                                       FontWeight="Bold"
-                                       MaxWidth="700" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Xem trước" Style="{StaticResource CardTitle}" />
+                                <Border x:Name="PreviewBorder" CornerRadius="6" Padding="16,14">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#F3F3F3" Offset="0" />
+                                            <GradientStop Color="#8896B4" Offset="0.6" />
+                                            <GradientStop Color="#2B3345" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <TextBlock x:Name="PreviewText"
+                                               Text="Đây là đáp án xem trước. Chữ sẽ hiện trên nền trong suốt khi chạy."
+                                               TextWrapping="Wrap"
+                                               Foreground="Black"
+                                               FontFamily="Segoe UI"
+                                               FontWeight="SemiBold"
+                                               MaxWidth="700" />
+                                </Border>
+                                <TextBlock Style="{StaticResource Hint}" Margin="0,8,0,0"
+                                           Text="Nền xem trước chuyển từ sáng sang tối để bạn kiểm tra màu chữ trên cả hai." />
+                            </StackPanel>
                         </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
             <TabItem Header="Phím tắt">
-                <StackPanel Margin="12">
-                    <TextBlock Text="Bấm vào ô rồi nhấn tổ hợp phím. Ví dụ: F2, esc, ctrl+shift+g." TextWrapping="Wrap" Margin="0,0,0,16" />
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="180" />
-                            <ColumnDefinition Width="220" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,12,8,0">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Phím tắt toàn cục" Style="{StaticResource CardTitle}" />
+                                <TextBlock Style="{StaticResource Hint}" Margin="0,0,0,14"
+                                           Text="Bấm vào ô rồi nhấn tổ hợp phím. Ví dụ: F2, esc, ctrl+shift+g." />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="200" />
+                                        <ColumnDefinition Width="220" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
 
-                        <TextBlock Text="Gửi (text/ảnh)" VerticalAlignment="Center" />
-                        <hotkeys:HotkeyTextBox x:Name="HotkeySendBox" Grid.Column="1" Margin="0,4" />
+                                    <TextBlock Text="Gửi (văn bản / ảnh)" VerticalAlignment="Center" />
+                                    <hotkeys:HotkeyTextBox x:Name="HotkeySendBox" Grid.Column="1" Margin="0,4" />
 
-                        <TextBlock Grid.Row="1" Text="Xem lại đáp án" VerticalAlignment="Center" />
-                        <hotkeys:HotkeyTextBox x:Name="HotkeyReplayBox" Grid.Row="1" Grid.Column="1" Margin="0,4" />
+                                    <TextBlock Grid.Row="1" Text="Xem lại đáp án" VerticalAlignment="Center" />
+                                    <hotkeys:HotkeyTextBox x:Name="HotkeyReplayBox" Grid.Row="1" Grid.Column="1" Margin="0,4" />
 
-                        <TextBlock Grid.Row="2" Text="Copy đáp án" VerticalAlignment="Center" />
-                        <hotkeys:HotkeyTextBox x:Name="HotkeyCopyBox" Grid.Row="2" Grid.Column="1" Margin="0,4" />
+                                    <TextBlock Grid.Row="2" Text="Copy đáp án" VerticalAlignment="Center" />
+                                    <hotkeys:HotkeyTextBox x:Name="HotkeyCopyBox" Grid.Row="2" Grid.Column="1" Margin="0,4" />
 
-                        <TextBlock Grid.Row="3" Text="Ẩn overlay" VerticalAlignment="Center" />
-                        <hotkeys:HotkeyTextBox x:Name="HotkeyHideBox" Grid.Row="3" Grid.Column="1" Margin="0,4" />
-                    </Grid>
-
-                    <Button x:Name="ResetHotkeysButton" Content="Khôi phục phím tắt mặc định" HorizontalAlignment="Left" Margin="0,20,0,0" Click="ResetHotkeys_Click" />
-                </StackPanel>
+                                    <TextBlock Grid.Row="3" Text="Ẩn overlay" VerticalAlignment="Center" />
+                                    <hotkeys:HotkeyTextBox x:Name="HotkeyHideBox" Grid.Row="3" Grid.Column="1" Margin="0,4" />
+                                </Grid>
+                                <Button x:Name="ResetHotkeysButton" Content="Khôi phục phím mặc định" HorizontalAlignment="Left" MinWidth="170" Margin="0,18,0,0" Click="ResetHotkeys_Click" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
             </TabItem>
 
             <TabItem Header="Gemini &amp; Chrome">
-                <StackPanel Margin="12">
-                    <TextBlock Text="Thư mục profile Chrome" FontWeight="SemiBold" />
-                    <Grid Margin="0,4,0,12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBox x:Name="ProfileDirBox" />
-                        <Button Grid.Column="1" Content="Chọn..." Padding="12,2" Margin="8,0,0,0" Click="BrowseProfile_Click" />
-                    </Grid>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,12,8,0">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Chrome" Style="{StaticResource CardTitle}" />
+                                <TextBlock Text="Thư mục profile" Style="{StaticResource FieldLabel}" />
+                                <Grid Margin="0,0,0,14">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="ProfileDirBox" />
+                                    <Button Grid.Column="1" Content="Chọn..." MinWidth="84" Margin="8,0,0,0" Click="BrowseProfile_Click" />
+                                </Grid>
 
-                    <TextBlock Text="Cổng debug" />
-                    <TextBox x:Name="DebugPortBox" Width="140" HorizontalAlignment="Left" Margin="0,4,0,12" />
+                                <TextBlock Text="Cổng debug" Style="{StaticResource FieldLabel}" />
+                                <TextBox x:Name="DebugPortBox" Style="{StaticResource NumberBox}" />
+                                <TextBlock Style="{StaticResource Hint}"
+                                           Text="Nếu cổng bị VS Code hoặc ứng dụng Electron chiếm, hãy đổi sang cổng khác (ví dụ 9223)." />
+                                <TextBlock x:Name="DetectedChromeText" Style="{StaticResource Hint}" Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Border>
 
-                    <TextBlock x:Name="DetectedChromeText" TextWrapping="Wrap" Margin="0,0,0,12" />
-
-                    <StackPanel Orientation="Horizontal">
-                        <Button x:Name="ShowChromeButton" Content="Mở Chrome" Padding="14,4" Click="ShowChrome_Click" />
-                        <Button x:Name="TestButton" Content="Test Gemini" Padding="14,4" Margin="8,0,0,0" Click="Test_Click" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Kiểm tra" Style="{StaticResource CardTitle}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:Name="ShowChromeButton" Content="Mở Chrome" MinWidth="120" Click="ShowChrome_Click" />
+                                    <Button x:Name="TestButton" Content="Test Gemini" MinWidth="120" Margin="8,0,0,0" Click="Test_Click" />
+                                </StackPanel>
+                                <TextBlock x:Name="TestStatusText" TextWrapping="Wrap" Margin="0,12,0,0" />
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
-                    <TextBlock x:Name="TestStatusText" TextWrapping="Wrap" Margin="0,12,0,0" />
-                    <TextBlock Text="Nếu cổng debug bị VS Code/Electron chiếm, hãy đổi cổng." TextWrapping="Wrap" Foreground="#666666" Margin="0,12,0,0" />
-                </StackPanel>
+                </ScrollViewer>
             </TabItem>
 
             <TabItem Header="Nâng cao">
-                <StackPanel Margin="12">
-                    <TextBlock Text="Selectors DOM của Gemini chỉ sửa trong config.json khi Google đổi giao diện." TextWrapping="Wrap" Margin="0,0,0,16" />
-                    <Button Content="Mở config.json" HorizontalAlignment="Left" Padding="14,4" Click="OpenConfig_Click" />
-                    <Button Content="Mở log" HorizontalAlignment="Left" Padding="14,4" Margin="0,8,0,0" Click="OpenLog_Click" />
-                    <Button x:Name="CheckUpdateButton" Content="Kiểm tra cập nhật" HorizontalAlignment="Left" Padding="14,4" Margin="0,8,0,0" Click="CheckUpdate_Click" />
-                    <TextBlock x:Name="UpdateStatusText" TextWrapping="Wrap" Margin="0,12,0,0" />
-                    <Button Content="Khôi phục toàn bộ mặc định" HorizontalAlignment="Left" Padding="14,4" Margin="0,24,0,0" Click="ResetAll_Click" />
-                </StackPanel>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,12,8,0">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Tệp và cập nhật" Style="{StaticResource CardTitle}" />
+                                <TextBlock Style="{StaticResource Hint}" Margin="0,0,0,14"
+                                           Text="Selectors DOM của Gemini chỉ sửa trong config.json khi Google đổi giao diện." />
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="Mở config.json" MinWidth="130" Click="OpenConfig_Click" />
+                                    <Button Content="Mở log" MinWidth="130" Margin="8,0,0,0" Click="OpenLog_Click" />
+                                    <Button x:Name="CheckUpdateButton" Content="Kiểm tra cập nhật" MinWidth="150" Margin="8,0,0,0" Click="CheckUpdate_Click" />
+                                </StackPanel>
+                                <TextBlock x:Name="UpdateStatusText" TextWrapping="Wrap" Margin="0,12,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Khôi phục" Style="{StaticResource CardTitle}" />
+                                <TextBlock Style="{StaticResource Hint}" Margin="0,0,0,14"
+                                           Text="Đưa mọi tùy chọn về mặc định (chỉ có hiệu lực sau khi bấm Lưu)." />
+                                <Button Content="Khôi phục toàn bộ mặc định" HorizontalAlignment="Left" MinWidth="210" Click="ResetAll_Click" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
             </TabItem>
         </TabControl>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
-            <Button Content="Hủy" Width="90" Margin="0,0,8,0" IsCancel="True" />
-            <Button Content="Lưu" Width="90" IsDefault="True" Click="Save_Click" />
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button Content="Hủy" MinWidth="96" Margin="0,0,8,0" IsCancel="True" />
+            <Button Content="Lưu" MinWidth="96" IsDefault="True" Style="{DynamicResource AccentButtonStyle}" Click="Save_Click" />
         </StackPanel>
     </Grid>
 </Window>
