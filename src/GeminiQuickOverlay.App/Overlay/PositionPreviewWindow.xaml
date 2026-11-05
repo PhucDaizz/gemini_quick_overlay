@@ -1,0 +1,33 @@
+<Window x:Class="GeminiQuickOverlay.App.Overlay.PositionPreviewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Xem trước vị trí"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        Topmost="True"
+        ResizeMode="NoResize"
+        ShowActivated="False"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="Manual"
+        Cursor="SizeAll"
+        ThemeMode="None">
+    <!-- The near-invisible fill keeps the whole box draggable even though the overlay itself is transparent. -->
+    <Border Background="#01000000" BorderBrush="#FF3B82F6" BorderThickness="2" CornerRadius="4" Padding="10,8"
+            ToolTip="Kéo để di chuyển vị trí hiện đáp án">
+        <StackPanel>
+            <TextBlock x:Name="MessageText"
+                       Text="Đáp án xem trước: B. 42 - kéo khung này để đặt vị trí"
+                       FontFamily="Segoe UI"
+                       FontWeight="SemiBold"
+                       Foreground="Black"
+                       TextWrapping="Wrap"
+                       MaxWidth="800">
+                <TextBlock.Effect>
+                    <DropShadowEffect Color="White" ShadowDepth="0" BlurRadius="6" Opacity="0.85" />
+                </TextBlock.Effect>
+            </TextBlock>
+        </StackPanel>
+    </Border>
+</Window>

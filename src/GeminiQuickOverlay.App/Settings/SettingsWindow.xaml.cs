@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using GeminiQuickOverlay.App.Hotkeys;
+using GeminiQuickOverlay.App.Overlay;
 using GeminiQuickOverlay.Core;
 using GeminiQuickOverlay.Core.Automation;
 using GeminiQuickOverlay.Core.Chrome;
@@ -24,6 +25,9 @@ public partial class SettingsWindow : Window
     private readonly CancellationTokenSource _lifetime = new();
     private AppConfig _draft;
     private bool _loading;
+    private bool _updatingOffsets;
+    private PositionPreviewWindow? _positionPreview;
+    private System.Windows.Controls.TextBox? _colorTarget;
 
     public SettingsWindow(ConfigService config, GeminiAutomation automation, UpdateService updates)
     {
@@ -35,7 +39,8 @@ public partial class SettingsWindow : Window
         InitializeComponent();
         Populate();
         _loading = false;
-        UpdatePreview();
+        ColorTextChanged(this, new RoutedEventArgs());
+        ColorPanel.ColorChanged += OnPickedColorChanged;
         UpdateDetectedChrome();
         try
         {
@@ -48,6 +53,7 @@ public partial class SettingsWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        HidePositionPreview();
         _lifetime.Cancel();
         _lifetime.Dispose();
         base.OnClosed(e);
@@ -226,20 +232,148 @@ public partial class SettingsWindow : Window
 
     private void UpdatePreview()
     {
-        if (PreviewText is null)
+        _positionPreview?.SetAppearance(
+            ParseBrush(TextColorBox.Text),
+            TryDouble(FontSizeBox.Text, 11, out var fontSize) ? fontSize : 11,
+            TryInt(WrapLengthBox.Text, 800, out var wrap) ? wrap : 800,
+            OpacitySlider.Value);
+    }
+
+    private void Tabs_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (!ReferenceEquals(e.OriginalSource, Tabs))
         {
             return;
         }
 
-        PreviewText.Foreground = ParseBrush(TextColorBox.Text);
-        PreviewText.FontSize = TryDouble(FontSizeBox.Text, 11, out var fontSize)
-            ? Math.Clamp(fontSize, 8, 72)
-            : 11;
-        PreviewText.MaxWidth = TryInt(WrapLengthBox.Text, 700, out var wrap)
-            ? Math.Clamp(wrap, 200, 700)
-            : 700;
-        PreviewText.Opacity = OpacitySlider.Value;
+        if (Tabs.SelectedItem is System.Windows.Controls.TabItem { Header: "Giao diện" })
+        {
+            ShowPositionPreview();
+        }
+        else
+        {
+            HidePositionPreview();
+        }
     }
+
+    private void ShowPositionPreview()
+    {
+        if (_positionPreview is null)
+        {
+            _positionPreview = new PositionPreviewWindow();
+            _positionPreview.OffsetsChanged += OnPreviewOffsetsChanged;
+        }
+
+        UpdatePreview();
+        SyncPreviewOffsets();
+        if (!_positionPreview.IsVisible)
+        {
+            _positionPreview.Show();
+        }
+    }
+
+    private void HidePositionPreview()
+    {
+        if (_positionPreview is null)
+        {
+            return;
+        }
+
+        _positionPreview.OffsetsChanged -= OnPreviewOffsetsChanged;
+        _positionPreview.Close();
+        _positionPreview = null;
+    }
+
+    private void OnPreviewOffsetsChanged(int left, int bottom)
+    {
+        _updatingOffsets = true;
+        try
+        {
+            LeftOffsetBox.Text = left.ToString(CultureInfo.CurrentCulture);
+            BottomOffsetBox.Text = bottom.ToString(CultureInfo.CurrentCulture);
+        }
+        finally
+        {
+            _updatingOffsets = false;
+        }
+    }
+
+    private void OffsetsTyped(object sender, RoutedEventArgs e)
+    {
+        if (!_loading && !_updatingOffsets)
+        {
+            SyncPreviewOffsets();
+        }
+    }
+
+    private void SyncPreviewOffsets()
+    {
+        if (_positionPreview is null)
+        {
+            return;
+        }
+
+        if (TryInt(LeftOffsetBox.Text, 0, out var left) && TryInt(BottomOffsetBox.Text, 0, out var bottom))
+        {
+            _positionPreview.SetOffsets(left, bottom);
+        }
+    }
+
+    private void ResetPosition_Click(object sender, RoutedEventArgs e)
+    {
+        var defaults = new AppConfig();
+        LeftOffsetBox.Text = defaults.PositionLeftOffset.ToString(CultureInfo.CurrentCulture);
+        BottomOffsetBox.Text = defaults.PositionBottomOffset.ToString(CultureInfo.CurrentCulture);
+    }
+
+    private void ColorTextChanged(object sender, RoutedEventArgs e)
+    {
+        if (TextColorSwatch is null || BackgroundColorSwatch is null)
+        {
+            return;
+        }
+
+        TextColorSwatch.Background = ParseBrush(TextColorBox.Text);
+        BackgroundColorSwatch.Background = ParseBrush(BackgroundColorBox.Text);
+        if (!_loading)
+        {
+            UpdatePreview();
+        }
+    }
+
+    private void PickTextColor_Click(object sender, RoutedEventArgs e) =>
+        OpenColorPicker(TextColorBox, TextColorButton);
+
+    private void PickBackgroundColor_Click(object sender, RoutedEventArgs e) =>
+        OpenColorPicker(BackgroundColorBox, BackgroundColorButton);
+
+    private void OpenColorPicker(System.Windows.Controls.TextBox target, System.Windows.Controls.Button anchor)
+    {
+        // Theme-aware solid background: light popup under dark text, dark popup under light text.
+        var textBrush = Foreground as SolidColorBrush;
+        var light = textBrush is null ||
+                    (0.299 * textBrush.Color.R + 0.587 * textBrush.Color.G + 0.114 * textBrush.Color.B) / 255 < 0.5;
+        ColorPopupBorder.Background = new SolidColorBrush(light
+            ? System.Windows.Media.Color.FromRgb(0xFB, 0xFB, 0xFB)
+            : System.Windows.Media.Color.FromRgb(0x2B, 0x2B, 0x2B));
+        ColorPopupBorder.SetValue(System.Windows.Documents.TextElement.ForegroundProperty, light ? System.Windows.Media.Brushes.Black : System.Windows.Media.Brushes.White);
+
+        ColorPopup.PlacementTarget = anchor;
+        ColorPanel.SetColor(ParseColor(target.Text));
+        _colorTarget = target;
+        ColorPopup.IsOpen = true;
+    }
+
+    private void OnPickedColorChanged(System.Windows.Media.Color color)
+    {
+        if (_colorTarget is not null)
+        {
+            _colorTarget.Text = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+        }
+    }
+
+    private static System.Windows.Media.Color ParseColor(string? value) =>
+        ParseBrush(value) is SolidColorBrush solid ? solid.Color : Colors.Black;
 
     private void UpdateDetectedChrome()
     {

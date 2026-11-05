@@ -1,0 +1,61 @@
+<UserControl x:Class="GeminiQuickOverlay.App.Settings.ColorPickerPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="232">
+    <StackPanel>
+        <Grid x:Name="SvArea" Width="232" Height="150" Cursor="Cross" Background="Red"
+              MouseLeftButtonDown="SvArea_MouseDown" MouseMove="SvArea_MouseMove" MouseLeftButtonUp="Area_MouseUp">
+            <Rectangle>
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#FFFFFFFF" Offset="0" />
+                        <GradientStop Color="#00FFFFFF" Offset="1" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+            <Rectangle>
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#00000000" Offset="0" />
+                        <GradientStop Color="#FF000000" Offset="1" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+            <Canvas IsHitTestVisible="False">
+                <Ellipse x:Name="SvThumb" Width="16" Height="16" Stroke="White" StrokeThickness="2" Fill="Transparent" />
+            </Canvas>
+        </Grid>
+
+        <Grid x:Name="HueBar" Width="232" Height="16" Margin="0,12,0,0" Cursor="Hand"
+              MouseLeftButtonDown="HueBar_MouseDown" MouseMove="HueBar_MouseMove" MouseLeftButtonUp="Area_MouseUp">
+            <Border CornerRadius="8">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#FF0000" Offset="0" />
+                        <GradientStop Color="#FFFF00" Offset="0.1667" />
+                        <GradientStop Color="#00FF00" Offset="0.3333" />
+                        <GradientStop Color="#00FFFF" Offset="0.5" />
+                        <GradientStop Color="#0000FF" Offset="0.6667" />
+                        <GradientStop Color="#FF00FF" Offset="0.8333" />
+                        <GradientStop Color="#FF0000" Offset="1" />
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+            <Canvas IsHitTestVisible="False">
+                <Border x:Name="HueThumb" Width="8" Height="22" Canvas.Top="-3" CornerRadius="4"
+                        BorderBrush="White" BorderThickness="2" Background="Transparent" />
+            </Canvas>
+        </Grid>
+
+        <Grid Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border x:Name="CurrentSwatch" Width="32" Height="32" CornerRadius="4" BorderBrush="#66808080" BorderThickness="1" Margin="0,0,8,0" />
+            <TextBox x:Name="HexBox" Grid.Column="1" VerticalAlignment="Center" MaxLength="9" TextChanged="HexBox_TextChanged" />
+        </Grid>
+
+        <WrapPanel x:Name="Presets" Margin="0,12,0,0" />
+    </StackPanel>
+</UserControl>
