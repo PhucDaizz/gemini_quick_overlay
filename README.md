@@ -27,8 +27,10 @@
 
 ### Cách 1: Dành cho người dùng phổ thông
 1. Vào mục **Releases** của repo, tải file `GeminiQuickOverlay-vX.Y.Z.zip` mới nhất và giải nén.
-2. Chạy file `GeminiQuickOverlay.exe` (hoặc tên file bạn đã đổi). Tool tự bật Chrome ngầm khi cần; Có thể chạy `START_TOOL.vbs` để bật cả Chrome lẫn tool chỉ bằng một cú nhấp đúp.
-3. **Tắt Tool:** Chạy `TAT_TOOL.bat` hoặc Task Manager → End task `GeminiQuickOverlay`.
+2. Chạy file `GeminiQuickOverlay.exe` (bản C#/WPF, một file duy nhất, không cần cài .NET). Tool tự bật Chrome ngầm khi cần, mọi tùy chọn chỉnh trong **Cài đặt** (menu tray).
+3. **Tắt Tool:** menu tray → **Thoát**.
+
+> Bản phát hành trên GitHub Releases là bản C#. Bản Python (thư mục `gemini_overlay/`, kèm `START_TOOL.vbs` và `TAT_TOOL.bat`) vẫn nằm trong repo để chạy từ source.
 
 ### Cách 2: Dành cho Developer (Chạy từ Source)
 1. Clone repo này về máy:
@@ -68,7 +70,7 @@ gemini_overlay/
     selenium.py   # Fallback Selenium
 ```
 
-### 📦 Build EXE
+### 📦 Build EXE (bản Python)
 
 ```bash
 python -m PyInstaller --noconfirm GeminiQuickOverlay.spec
@@ -76,7 +78,7 @@ python -m PyInstaller --noconfirm GeminiQuickOverlay.spec
 
 Sau khi build, chép `dist\GeminiQuickOverlay.exe` ra thư mục gốc (cạnh `START_TOOL.vbs` và `config.json`). File `.exe` không được commit vào git.
 
-**Phát hành bản mới:** đẩy một tag dạng `vX.Y.Z` (`git tag v1.0.0 && git push origin v1.0.0`). GitHub Actions ([release.yml](.github/workflows/release.yml)) sẽ chạy test, build exe và đăng file ZIP lên Releases.
+**Phát hành bản mới:** nâng `Version` trong `src/GeminiQuickOverlay.App/GeminiQuickOverlay.App.csproj` và `AppVersion` trong `src/GeminiQuickOverlay.Core/AppConstants.cs`, rồi đẩy tag khớp (`git tag v1.3.0 && git push origin v1.3.0`). GitHub Actions ([release.yml](.github/workflows/release.yml)) tự build bản C# (`dotnet publish`) và đăng file ZIP lên Releases; tag không khớp phiên bản thì build dừng.
 
 ## 🎮 Hướng dẫn sử dụng
 
