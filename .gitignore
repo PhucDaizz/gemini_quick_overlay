@@ -20,6 +20,12 @@ ChromeProfile/
 *.log
 update_state.json
 
+# .NET
+bin/
+obj/
+.vs/
+*.user
+
 # IDE
 .vscode/
 .idea/
