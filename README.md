@@ -109,7 +109,8 @@ Sau khi build, chép `dist\GeminiQuickOverlay.exe` ra thư mục gốc (cạnh `
 | **F2** | **GỬI (AUTO)**: Tự phát hiện Text hoặc Ảnh trong Clipboard để gửi đi. |
 | **F3** | **COPY ĐÁP ÁN**: Copy đáp án gần nhất vào clipboard (không hiện overlay). |
 | **F4** | **XEM LẠI**: Hiển thị lại đáp án gần nhất theo `display_seconds`. |
-| **ESC** | **ẨN NGAY**: Tắt ngay lập tức lớp phủ đáp án. |
+| **ESC** | **ẨN NGAY**: Tắt ngay lập tức lớp phủ đáp án. Khi đang chọn vùng chụp thì Esc để hủy. |
+| **F6** *(bản C#)* | **CHỤP VÙNG**: màn hình đóng băng, kéo chuột chọn vùng, thả chuột là ảnh được gửi cho Gemini luôn (không cần Win+Shift+S rồi F2, không đụng tới clipboard). Chuột phải hoặc Esc để hủy. Đổi phím trong Cài đặt → Phím tắt. |
 
 Các phím trên có thể đổi trong `config.json` qua `hotkey_send`, `hotkey_copy`, `hotkey_replay`, `hotkey_hide`.
 
@@ -171,6 +172,17 @@ Chỉ cần gửi một thư mục/ZIP gồm:
 - `TAT_TOOL.bat`
 
 Không gửi source `.py`, `build/`, `dist/`, file log hoặc các file `.exe` cũ.
+
+## 🛡️ Cảnh báo "Windows protected your PC" (SmartScreen)
+
+Khi mở `GeminiQuickOverlay.exe` lần đầu, Windows có thể hiện *"Windows protected your PC / Unknown Publisher"*. Đây là cảnh báo chung cho **mọi file chưa được ký số và chưa có nhiều lượt tải**, không phải do tool có mã độc. Mã nguồn công khai ngay trong repo này và file phát hành được build tự động bởi GitHub Actions từ chính mã đó.
+
+Cách mở mà không bị cảnh báo hoặc vượt qua cảnh báo:
+1. **Unblock trước khi giải nén (khuyên dùng):** nhấp phải file `.zip` vừa tải → **Properties** → tick **Unblock** → OK → rồi mới giải nén.
+2. **Hoặc** khi hộp thoại hiện ra: bấm **More info** → **Run anyway**.
+3. **Kiểm tra file không bị sửa:** mỗi bản phát hành có file `SHA256SUMS.txt`. Chạy `Get-FileHash .\GeminiQuickOverlay-vX.Y.Z.zip -Algorithm SHA256` trong PowerShell và so với giá trị trong file đó.
+
+> Nếu máy bật **Smart App Control** (Windows 11) thì file chưa ký có thể bị chặn hoàn toàn. Khi đó hãy dùng bản Python chạy từ source, hoặc tắt Smart App Control trong Windows Security.
 
 ## ⚠️ Lưu ý
 

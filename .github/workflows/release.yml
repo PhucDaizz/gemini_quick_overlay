@@ -41,9 +41,13 @@ jobs:
           New-Item -ItemType Directory $dir | Out-Null
           Copy-Item publish/GeminiQuickOverlay.exe $dir
           Compress-Archive -Path $dir -DestinationPath "$dir.zip"
+          $hash = (Get-FileHash "$dir.zip" -Algorithm SHA256).Hash.ToLower()
+          "$hash  $dir.zip" | Out-File -Encoding ascii SHA256SUMS.txt
 
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          files: GeminiQuickOverlay-${{ github.ref_name }}.zip
+          files: |
+            GeminiQuickOverlay-${{ github.ref_name }}.zip
+            SHA256SUMS.txt
           generate_release_notes: true
