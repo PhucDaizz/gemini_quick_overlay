@@ -12,7 +12,14 @@
     <AssemblyName>GeminiQuickOverlay</AssemblyName>
     <RootNamespace>GeminiQuickOverlay.App</RootNamespace>
     <Version>1.3.0</Version>
-    <Authors>PĐ</Authors>
+    <Authors>PhucDaizz</Authors>
+    <Company>PhucDaizz</Company>
+    <Product>Gemini Quick Overlay</Product>
+    <AssemblyTitle>Gemini Quick Overlay</AssemblyTitle>
+    <Description>Quick Gemini answers in a transparent overlay, without switching tabs.</Description>
+    <Copyright>Copyright (c) 2026 PhucDaizz</Copyright>
+    <RepositoryUrl>https://github.com/PhucDaizz/gemini_quick_overlay</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishSingleFile>true</PublishSingleFile>

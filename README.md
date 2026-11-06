@@ -184,6 +184,34 @@ Cách mở mà không bị cảnh báo hoặc vượt qua cảnh báo:
 
 > Nếu máy bật **Smart App Control** (Windows 11) thì file chưa ký có thể bị chặn hoàn toàn. Khi đó hãy dùng bản Python chạy từ source, hoặc tắt Smart App Control trong Windows Security.
 
+## Code signing policy
+
+**Current status:** release binaries are **not code-signed yet**, which is why Windows SmartScreen shows an "Unknown Publisher" warning (see the section above). Code signing through [SignPath Foundation](https://signpath.org) is planned; this section will be updated with the required attribution once it is approved.
+
+Release binaries are produced only by the automated GitHub Actions workflow ([release.yml](.github/workflows/release.yml)) from the source in this repository, with no manual build step.
+
+Team roles (single-maintainer project):
+- **Author / committer:** [PhucDaizz](https://github.com/PhucDaizz)
+- **Reviewer:** [PhucDaizz](https://github.com/PhucDaizz)
+- **Approver:** [PhucDaizz](https://github.com/PhucDaizz)
+
+## Privacy
+
+This application has no telemetry and no account of its own. It only communicates with the following:
+
+| What | Where it goes | When | How to turn it off |
+|------|---------------|------|--------------------|
+| Text from your clipboard, or the image / screen region you choose to send | **Google Gemini** (`gemini.google.com`), through **your own** Chrome profile that you are signed in to. The app itself never talks to Google; it drives that Chrome over the local debug port (`127.0.0.1`). Google's own privacy policy applies to what Gemini receives. | Only when you press the send or capture hotkey | Do not press the hotkeys |
+| Release information | `api.github.com` (latest release tag only; nothing about you is sent) | At startup, at most once a day, and when you choose "Check for updates" | Set `check_updates` to `false` in `config.json` or untick it in Settings |
+
+Everything else stays on your machine: settings are in `config.json`, and the log file `gemini_helper.log` contains only operational messages (such as hotkey registration, Chrome start and error messages) and the address of the Gemini tab, not your questions or answers. The last answer is kept in memory only until the app closes.
+
+The tool has no installer and writes only next to its own `.exe` (settings, log, update-check cache) plus the Chrome profile folder shown in Settings (default `C:\selenium\ChromeProfile`), which holds the saved Gemini sign-in. To remove it, close it from the tray menu and delete those folders.
+
+## Giấy phép
+
+[MIT](LICENSE) © 2026 PhucDaizz.
+
 ## ⚠️ Lưu ý
 
 - Đây là công cụ hỗ trợ học tập và tra cứu. Tác giả không chịu trách nhiệm nếu sử dụng sai mục đích.
