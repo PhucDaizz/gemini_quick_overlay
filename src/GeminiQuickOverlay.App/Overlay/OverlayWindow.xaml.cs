@@ -79,7 +79,7 @@ public partial class OverlayWindow : Window
     private void PositionWindow()
     {
         var config = _config.Current;
-        var workArea = SystemParameters.WorkArea;
+        var workArea = ScreenArea.Bounds;
         var width = Math.Max(ActualWidth, 1);
         var height = Math.Max(ActualHeight, 1);
         var left = Math.Clamp(

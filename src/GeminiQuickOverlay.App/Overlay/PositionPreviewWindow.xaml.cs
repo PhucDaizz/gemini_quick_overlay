@@ -71,7 +71,7 @@ public partial class PositionPreviewWindow : Window
 
     private void Reposition()
     {
-        var workArea = SystemParameters.WorkArea;
+        var workArea = ScreenArea.Bounds;
         var width = Math.Max(ActualWidth, 1);
         var height = Math.Max(ActualHeight, 1);
         Left = Math.Clamp(
@@ -101,7 +101,7 @@ public partial class PositionPreviewWindow : Window
 
     private void ReportOffsets()
     {
-        var workArea = SystemParameters.WorkArea;
+        var workArea = ScreenArea.Bounds;
         _leftOffset = Math.Max(0, (int)Math.Round(Left - workArea.Left));
         _bottomOffset = Math.Max(0, (int)Math.Round(workArea.Bottom - Top - ActualHeight));
         OffsetsChanged?.Invoke(_leftOffset, _bottomOffset);
