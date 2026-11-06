@@ -160,10 +160,11 @@
                                            Text="Bấm vào ô rồi nhấn tổ hợp phím. Ví dụ: F2, esc, ctrl+shift+g." />
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="200" />
+                                        <ColumnDefinition Width="230" />
                                         <ColumnDefinition Width="220" />
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
@@ -181,6 +182,9 @@
 
                                     <TextBlock Grid.Row="3" Text="Ẩn overlay" VerticalAlignment="Center" />
                                     <hotkeys:HotkeyTextBox x:Name="HotkeyHideBox" Grid.Row="3" Grid.Column="1" Margin="0,4" />
+
+                                    <TextBlock Grid.Row="4" Text="Chụp vùng màn hình rồi gửi" VerticalAlignment="Center" />
+                                    <hotkeys:HotkeyTextBox x:Name="HotkeyCaptureBox" Grid.Row="4" Grid.Column="1" Margin="0,4" />
                                 </Grid>
                                 <Button x:Name="ResetHotkeysButton" Content="Khôi phục phím mặc định" HorizontalAlignment="Left" MinWidth="170" Margin="0,18,0,0" Click="ResetHotkeys_Click" />
                             </StackPanel>

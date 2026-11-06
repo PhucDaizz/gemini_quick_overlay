@@ -53,6 +53,8 @@ public sealed class AppConfig
 
     public string HotkeyHide { get; set; } = "esc";
 
+    public string HotkeyCapture { get; set; } = "f6";
+
     public bool ShowPending { get; set; } = true;
 
     public Selectors Selectors { get; set; } = new();

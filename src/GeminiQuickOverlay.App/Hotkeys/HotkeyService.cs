@@ -33,6 +33,8 @@ public sealed class HotkeyService : IDisposable
 
     public event Action? HidePressed;
 
+    public event Action? CapturePressed;
+
     public void RegisterAll(AppConfig config)
     {
         UnregisterAll();
@@ -40,6 +42,7 @@ public sealed class HotkeyService : IDisposable
         Register(2, config.HotkeyReplay, "replay");
         Register(3, config.HotkeyCopy, "copy");
         Register(4, config.HotkeyHide, "hide");
+        Register(5, config.HotkeyCapture, "capture");
     }
 
     public void Dispose()
@@ -102,6 +105,9 @@ public sealed class HotkeyService : IDisposable
                 break;
             case 4:
                 HidePressed?.Invoke();
+                break;
+            case 5:
+                CapturePressed?.Invoke();
                 break;
         }
 

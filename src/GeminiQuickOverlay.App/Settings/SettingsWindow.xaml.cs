@@ -86,6 +86,7 @@ public partial class SettingsWindow : Window
         HotkeyReplayBox.Text = _draft.HotkeyReplay;
         HotkeyCopyBox.Text = _draft.HotkeyCopy;
         HotkeyHideBox.Text = _draft.HotkeyHide;
+        HotkeyCaptureBox.Text = _draft.HotkeyCapture;
 
         ProfileDirBox.Text = _draft.ProfileDir;
         DebugPortBox.Text = _draft.DebugPort.ToString(CultureInfo.CurrentCulture);
@@ -213,6 +214,7 @@ public partial class SettingsWindow : Window
         HotkeyReplayBox.Text = "f4";
         HotkeyCopyBox.Text = "f3";
         HotkeyHideBox.Text = "esc";
+        HotkeyCaptureBox.Text = "f6";
     }
 
     private void AppearanceChanged(object sender, RoutedEventArgs e)
@@ -456,6 +458,7 @@ public partial class SettingsWindow : Window
             (Name: "Xem lại", Value: HotkeyReplayBox.Text),
             (Name: "Copy", Value: HotkeyCopyBox.Text),
             (Name: "Ẩn overlay", Value: HotkeyHideBox.Text),
+            (Name: "Chụp vùng", Value: HotkeyCaptureBox.Text),
         };
         var used = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var hotkey in hotkeys)
@@ -496,6 +499,7 @@ public partial class SettingsWindow : Window
         draft.HotkeyReplay = HotkeyReplayBox.Text.Trim();
         draft.HotkeyCopy = HotkeyCopyBox.Text.Trim();
         draft.HotkeyHide = HotkeyHideBox.Text.Trim();
+        draft.HotkeyCapture = HotkeyCaptureBox.Text.Trim();
 
         draft.ProfileDir = ProfileDirBox.Text.Trim();
         draft.DebugPort = debugPort;

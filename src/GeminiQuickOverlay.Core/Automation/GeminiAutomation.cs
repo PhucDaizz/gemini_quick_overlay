@@ -24,7 +24,8 @@ public sealed class GeminiAutomation : IAsyncDisposable
         string text,
         bool isImage,
         byte[]? imagePng,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        bool pasteWithShortcut = true)
     {
         await _operation.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
@@ -97,7 +98,7 @@ public sealed class GeminiAutomation : IAsyncDisposable
                     await InsertTextAsync(client, selectors.Input, config.PromptImage, cancellationToken)
                         .ConfigureAwait(false);
                     await Task.Delay(100, cancellationToken).ConfigureAwait(false);
-                    await PasteImageAsync(client, selectors, config, imagePng, cancellationToken)
+                    await PasteImageAsync(client, selectors, config, imagePng, pasteWithShortcut, cancellationToken)
                         .ConfigureAwait(false);
                     await Task.Delay(400, cancellationToken).ConfigureAwait(false);
                 }
@@ -414,6 +415,7 @@ public sealed class GeminiAutomation : IAsyncDisposable
         Selectors selectors,
         AppConfig config,
         byte[]? imagePng,
+        bool pasteWithShortcut,
         CancellationToken cancellationToken)
     {
         var imageWait = Math.Max(1, config.ImageWait);
@@ -424,33 +426,37 @@ public sealed class GeminiAutomation : IAsyncDisposable
         var initialPreview = baseline is { ValueKind: JsonValueKind.Object } ? GetInt(baseline.Value, "preview") : 0;
         var initialNodes = baseline is { ValueKind: JsonValueKind.Object } ? GetInt(baseline.Value, "nodes") : 0;
 
-        await client.DispatchKeyEventAsync(
-                "rawKeyDown",
-                "v",
-                "KeyV",
-                86,
-                2,
-                cancellationToken)
-            .ConfigureAwait(false);
-        await client.DispatchKeyEventAsync(
-                "keyUp",
-                "v",
-                "KeyV",
-                86,
-                2,
-                cancellationToken)
-            .ConfigureAwait(false);
-
-        var wait = Math.Min(4, imageWait);
-        var preview = await client.EvaluateAsync(
-                JavaScriptLibrary.WaitPaste(selectors.ImagePreview, initialPreview, initialNodes, MinNodesForPaste, wait * 1000),
-                awaitPromise: true,
-                cancellationToken: cancellationToken,
-                timeout: TimeSpan.FromSeconds(wait + 5))
-            .ConfigureAwait(false);
-        if (preview is { ValueKind: JsonValueKind.True })
+        // A region capture is not on the system clipboard, so pasting it directly skips the Ctrl+V attempt.
+        if (pasteWithShortcut)
         {
-            return;
+            await client.DispatchKeyEventAsync(
+                    "rawKeyDown",
+                    "v",
+                    "KeyV",
+                    86,
+                    2,
+                    cancellationToken)
+                .ConfigureAwait(false);
+            await client.DispatchKeyEventAsync(
+                    "keyUp",
+                    "v",
+                    "KeyV",
+                    86,
+                    2,
+                    cancellationToken)
+                .ConfigureAwait(false);
+
+            var wait = Math.Min(4, imageWait);
+            var preview = await client.EvaluateAsync(
+                    JavaScriptLibrary.WaitPaste(selectors.ImagePreview, initialPreview, initialNodes, MinNodesForPaste, wait * 1000),
+                    awaitPromise: true,
+                    cancellationToken: cancellationToken,
+                    timeout: TimeSpan.FromSeconds(wait + 5))
+                .ConfigureAwait(false);
+            if (preview is { ValueKind: JsonValueKind.True })
+            {
+                return;
+            }
         }
 
         if (imagePng is null)
@@ -460,7 +466,9 @@ public sealed class GeminiAutomation : IAsyncDisposable
 
         try
         {
-            AppLog.Info("Ctrl+V không thấy ảnh, thử synthetic paste.");
+            AppLog.Info(pasteWithShortcut
+                ? "Ctrl+V không thấy ảnh, thử synthetic paste."
+                : "Dán ảnh chụp vùng bằng synthetic paste.");
             var base64 = Convert.ToBase64String(imagePng);
             await client.EvaluateAsync(
                     JavaScriptLibrary.SyntheticPaste(selectors.Input, base64),

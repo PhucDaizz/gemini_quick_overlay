@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows;
+using GeminiQuickOverlay.App.Capture;
 using GeminiQuickOverlay.App.Hotkeys;
 using GeminiQuickOverlay.App.Overlay;
 using GeminiQuickOverlay.App.Services;
@@ -76,6 +77,7 @@ public partial class App : System.Windows.Application
             _hotkeys.ReplayPressed += OnReplayPressed;
             _hotkeys.CopyPressed += OnCopyPressed;
             _hotkeys.HidePressed += OnHidePressed;
+            _hotkeys.CapturePressed += OnCapturePressed;
             _hotkeys.RegisterAll(_config.Current);
             _config.SettingsChanged += OnSettingsChanged;
 
@@ -168,6 +170,46 @@ public partial class App : System.Windows.Application
             return;
         }
 
+        await SendAsync(prompt, isImage, clipboard.ImagePng, pasteWithShortcut: true);
+    }
+
+    private async void OnCapturePressed()
+    {
+        if (_busy || ScreenCaptureService.IsActive)
+        {
+            return;
+        }
+
+        // Block F2 while selecting; the flag is released before SendAsync takes it again.
+        _busy = true;
+        byte[]? png = null;
+        try
+        {
+            _overlay!.HideNow();
+            await Task.Delay(150); // let the overlay disappear so it is not part of the screenshot
+            png = await ScreenCaptureService.PickRegionPngAsync(_config!.Current.ImageMaxSize);
+        }
+        catch (Exception exception)
+        {
+            AppLog.Error(exception, "Chụp vùng màn hình lỗi");
+            _overlay!.ShowMessage($"Lỗi chụp màn hình: {exception.Message}", 5);
+        }
+        finally
+        {
+            _busy = false;
+        }
+
+        if (png is null)
+        {
+            return;
+        }
+
+        await SendAsync("", isImage: true, png, pasteWithShortcut: false);
+    }
+
+    private async Task SendAsync(string prompt, bool isImage, byte[]? imagePng, bool pasteWithShortcut)
+    {
+        var config = _config!.Current;
         _busy = true;
         _sendCancellation = new CancellationTokenSource();
         if (config.ShowPending)
@@ -180,8 +222,9 @@ public partial class App : System.Windows.Application
             var outcome = await _automation!.SendAndGetResponseAsync(
                 prompt,
                 isImage,
-                clipboard.ImagePng,
-                _sendCancellation.Token);
+                imagePng,
+                _sendCancellation.Token,
+                pasteWithShortcut);
             if (outcome.Status == AutomationStatus.Cancelled)
             {
                 return;
@@ -238,6 +281,8 @@ public partial class App : System.Windows.Application
 
     private void OnHidePressed()
     {
+        // Esc is a global hotkey, so the selection form never receives it: cancel the capture here.
+        ScreenCaptureService.CancelActive();
         _sendCancellation?.Cancel();
         if (_automation is not null)
         {
