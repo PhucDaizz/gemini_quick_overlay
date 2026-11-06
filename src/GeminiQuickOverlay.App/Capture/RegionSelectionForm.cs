@@ -5,8 +5,8 @@ using System.Windows.Forms;
 namespace GeminiQuickOverlay.App.Capture;
 
 /// <summary>
-/// Full-screen frozen-frame selector. It paints a dimmed copy of the screenshot and lets the user
-/// drag a rectangle; the selection is reported in screenshot pixel coordinates. WinForms is used on
+/// Full-screen frozen-frame selector. It paints the screenshot at its original brightness and lets the
+/// user drag a rectangle; the selection is reported in screenshot pixel coordinates. WinForms is used on
 /// purpose: with per-monitor DPI awareness its bounds are physical pixels, which is what the screen
 /// capture needs, whereas WPF would work in scaled units.
 /// </summary>
@@ -15,7 +15,6 @@ internal sealed class RegionSelectionForm : Form
     private const int MinSelectionSize = 8;
 
     private readonly Bitmap _frozen;
-    private readonly Bitmap _dimmed;
     private readonly Rectangle _screenBounds;
     private readonly TaskCompletionSource<Rectangle?> _result = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private Point _start;
@@ -26,7 +25,6 @@ internal sealed class RegionSelectionForm : Form
     {
         _frozen = frozen;
         _screenBounds = screenBounds;
-        _dimmed = CreateDimmed(frozen);
 
         AutoScaleMode = AutoScaleMode.None;
         FormBorderStyle = FormBorderStyle.None;
@@ -123,14 +121,13 @@ internal sealed class RegionSelectionForm : Form
     protected override void OnPaint(PaintEventArgs e)
     {
         var g = e.Graphics;
-        g.DrawImageUnscaled(_dimmed, 0, 0);
+        g.DrawImageUnscaled(_frozen, 0, 0);
         if (_selection.Width <= 0 || _selection.Height <= 0)
         {
             DrawHint(g);
             return;
         }
 
-        g.DrawImage(_frozen, _selection, _selection, GraphicsUnit.Pixel);
         using (var pen = new Pen(Color.FromArgb(0x3B, 0x82, 0xF6), 2))
         {
             g.DrawRectangle(pen, _selection);
@@ -157,16 +154,6 @@ internal sealed class RegionSelectionForm : Form
         base.OnFormClosed(e);
     }
 
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            _dimmed.Dispose();
-        }
-
-        base.Dispose(disposing);
-    }
-
     private void DrawHint(Graphics g)
     {
         const string hint = "Kéo chuột để chọn vùng cần gửi  •  Esc hoặc chuột phải để hủy";
@@ -180,15 +167,5 @@ internal sealed class RegionSelectionForm : Form
         g.SmoothingMode = SmoothingMode.AntiAlias;
         g.FillRectangle(fill, box);
         g.DrawString(hint, font, Brushes.White, x, y);
-    }
-
-    private static Bitmap CreateDimmed(Bitmap source)
-    {
-        var dimmed = new Bitmap(source.Width, source.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-        using var g = Graphics.FromImage(dimmed);
-        g.DrawImageUnscaled(source, 0, 0);
-        using var shade = new SolidBrush(Color.FromArgb(120, 0, 0, 0));
-        g.FillRectangle(shade, 0, 0, dimmed.Width, dimmed.Height);
-        return dimmed;
     }
 }
