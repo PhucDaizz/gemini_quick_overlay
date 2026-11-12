@@ -3,7 +3,7 @@ namespace GeminiQuickOverlay.Core;
 public static class AppConstants
 {
     public const string AppName = "AIHelper";
-    public const string AppVersion = "1.4.0";
+    public const string AppVersion = "1.4.1";
     public const string GeminiUrl = "https://gemini.google.com/app";
     public const string ConfigFileName = "config.json";
     public const string LogFileName = "gemini_helper.log";
