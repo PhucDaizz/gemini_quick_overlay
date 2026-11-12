@@ -72,6 +72,8 @@ public partial class SettingsWindow : Window
         ShowPendingCheck.IsChecked = _draft.ShowPending;
         CheckUpdatesCheck.IsChecked = _draft.CheckUpdates;
         AutoLaunchCheck.IsChecked = _draft.AutoLaunchChrome;
+        ApiServerCheck.IsChecked = _draft.ApiServerEnabled;
+        ApiServerPortBox.Text = _draft.ApiServerPort.ToString(CultureInfo.CurrentCulture);
 
         TextColorBox.Text = _draft.TextColor;
         BackgroundColorBox.Text = _draft.BackgroundColor;
@@ -451,6 +453,11 @@ public partial class SettingsWindow : Window
             error = "Cổng debug phải từ 1 đến 65535.";
             return false;
         }
+        if (!TryInt(ApiServerPortBox.Text, _draft.ApiServerPort, out var apiPort, 1024, 65535) || apiPort == debugPort)
+        {
+            error = "Cổng API phải từ 1024 đến 65535 và khác cổng debug Chrome.";
+            return false;
+        }
 
         var hotkeys = new[]
         {
@@ -486,6 +493,8 @@ public partial class SettingsWindow : Window
         draft.ShowPending = ShowPendingCheck.IsChecked == true;
         draft.CheckUpdates = CheckUpdatesCheck.IsChecked == true;
         draft.AutoLaunchChrome = AutoLaunchCheck.IsChecked == true;
+        draft.ApiServerEnabled = ApiServerCheck.IsChecked == true;
+        draft.ApiServerPort = apiPort;
 
         draft.TextColor = TextColorBox.Text.Trim();
         draft.BackgroundColor = BackgroundColorBox.Text.Trim();

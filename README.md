@@ -50,6 +50,16 @@
      python GeminiQuickOverlay.py
      ```
 
+### 🔌 Cho app khác dùng Gemini (cổng kiểu OpenAI, không cần API key)
+
+- **Bản C# (khuyên dùng):** mở **Cài đặt → Gemini & Chrome**, bật công tắc **Cổng API (kiểu OpenAI)**, chọn cổng (mặc định 8765) rồi Lưu. Mặc định TẮT; tắt công tắc là đóng cổng ngay, không cần khởi động lại.
+- **Bản Python:**
+```bash
+python -m gemini_overlay.server        # nghe tại http://127.0.0.1:8765/v1 (đổi cổng: thêm số cổng ở cuối)
+```
+
+App nào nói được giao thức OpenAI (`POST /v1/chat/completions`) thì trỏ địa chỉ về `http://127.0.0.1:8765/v1`, tên model tuỳ ý, không cần khoá. Mỗi yêu cầu được gõ vào trang Gemini trong Chrome nên mất vài giây và chạy từng câu một; Chrome phải đang đăng nhập Gemini. Chỉ nghe trên máy này. Bản Python không chạy cùng lúc với tool overlay Python (gõ chồng nhau trong cùng tab); bản C# xếp hàng từng câu nên dùng cùng phím tắt được.
+
 ### 🗂 Cấu trúc dự án
 
 ```text

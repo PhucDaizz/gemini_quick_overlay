@@ -7,6 +7,7 @@ using GeminiQuickOverlay.App.Services;
 using GeminiQuickOverlay.App.Settings;
 using GeminiQuickOverlay.App.Tray;
 using GeminiQuickOverlay.Core;
+using GeminiQuickOverlay.Core.Api;
 using GeminiQuickOverlay.Core.Automation;
 using GeminiQuickOverlay.Core.Chrome;
 using GeminiQuickOverlay.Core.Config;
@@ -26,6 +27,7 @@ public partial class App : System.Windows.Application
     private GeminiAutomation? _automation;
     private UpdateService? _updates;
     private SettingsWindow? _settingsWindow;
+    private LocalApiServer? _apiServer;
     private CancellationTokenSource? _sendCancellation;
     private string _lastResponse = "";
     private DateTime _lastSendUtc;
@@ -80,6 +82,7 @@ public partial class App : System.Windows.Application
             _hotkeys.CapturePressed += OnCapturePressed;
             _hotkeys.RegisterAll(_config.Current);
             _config.SettingsChanged += OnSettingsChanged;
+            ApplyApiServer();
 
             if (_config.Current.CheckUpdates)
             {
@@ -110,6 +113,7 @@ public partial class App : System.Windows.Application
         {
             _sendCancellation?.Cancel();
             _hotkeys?.Dispose();
+            _apiServer?.Dispose();
             _tray?.Dispose();
             _overlay?.Close();
             _config?.Dispose();
@@ -388,6 +392,40 @@ public partial class App : System.Windows.Application
             }
             _overlay!.ApplyConfig();
             _hotkeys!.RegisterAll(_config!.Current);
+            ApplyApiServer();
         });
     }
+
+    /// <summary>Bật/tắt/đổi cổng của cổng API nội bộ theo công tắc trong Cài đặt.</summary>
+    private void ApplyApiServer()
+    {
+        var config = _config!.Current;
+        var want = config.ApiServerEnabled;
+        if (_apiServer is not null && (!want || _apiServer.Port != config.ApiServerPort))
+        {
+            _apiServer.Dispose();
+            _apiServer = null;
+        }
+        if (!want || _apiServer is not null)
+        {
+            return;
+        }
+
+        try
+        {
+            _apiServer = new LocalApiServer(config.ApiServerPort, AskFromApiAsync);
+            _apiServer.Start();
+            _overlay!.ShowMessage($"Cổng API đang bật: http://127.0.0.1:{config.ApiServerPort}/v1", 4);
+        }
+        catch (Exception exception)
+        {
+            _apiServer?.Dispose();
+            _apiServer = null;
+            AppLog.Error(exception, "Không mở được cổng API");
+            _overlay!.ShowMessage($"Không mở được cổng API {config.ApiServerPort}: {exception.Message}", 6);
+        }
+    }
+
+    private Task<AutomationOutcome> AskFromApiAsync(string prompt, CancellationToken token) =>
+        _automation!.SendAndGetResponseAsync(prompt, isImage: false, imagePng: null, token);
 }

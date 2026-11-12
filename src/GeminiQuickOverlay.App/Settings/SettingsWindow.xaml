@@ -77,6 +77,17 @@
                                 <CheckBox x:Name="AutoLaunchCheck" Content="Tự bật Chrome nếu cổng debug chưa mở" />
                             </StackPanel>
                         </Border>
+
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Cổng API cho app khác" Style="{StaticResource CardTitle}" />
+                                <CheckBox x:Name="ApiServerCheck" Content="Bật cổng API (kiểu OpenAI) để app khác dùng Gemini trong Chrome" Margin="0,0,0,8" />
+                                <TextBlock Text="Cổng" Style="{StaticResource FieldLabel}" />
+                                <TextBox x:Name="ApiServerPortBox" Style="{StaticResource NumberBox}" />
+                                <TextBlock Style="{StaticResource Hint}"
+                                           Text="Địa chỉ cho app kia: http://127.0.0.1:&lt;cổng&gt;/v1 (không cần khoá, tên model tuỳ ý). Chỉ nghe trên máy này. Mỗi câu hỏi được gõ vào trang Gemini nên mất vài giây; Chrome phải đang đăng nhập Gemini. Không dùng để tự động hoá số lượng lớn." />
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

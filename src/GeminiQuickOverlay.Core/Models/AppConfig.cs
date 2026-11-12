@@ -43,6 +43,11 @@ public sealed class AppConfig
 
     public bool CheckUpdates { get; set; } = true;
 
+    /// <summary>Công tắc cổng API nội bộ kiểu OpenAI cho app khác dùng Gemini (mặc định TẮT).</summary>
+    public bool ApiServerEnabled { get; set; } = false;
+
+    public int ApiServerPort { get; set; } = 8765;
+
     public string ProfileDir { get; set; } = "";
 
     public string HotkeySend { get; set; } = "f2";
