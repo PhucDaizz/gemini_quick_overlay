@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using GeminiQuickOverlay.Core.Automation;
 using GeminiQuickOverlay.Core.Logging;
+using GeminiQuickOverlay.Core.Models;
 
 namespace GeminiQuickOverlay.Core.Api;
 
@@ -16,15 +17,22 @@ public sealed class LocalApiServer : IDisposable
     public const int MaxBodyBytes = 64 * 1024;
 
     // Các câu báo lỗi của backend (không phải câu trả lời của Gemini) đã được GeminiAutomation đánh dấu bằng AutomationStatus.Error.
-    private readonly Func<string, CancellationToken, Task<AutomationOutcome>> _ask;
+    private readonly Func<string, string?, CancellationToken, Task<AutomationOutcome>> _ask;
+    private readonly Func<string> _defaultProviderId;
     private readonly HttpListener _listener = new();
     private readonly CancellationTokenSource _stop = new();
     private Task? _loop;
 
-    public LocalApiServer(int port, Func<string, CancellationToken, Task<AutomationOutcome>> ask)
+    /// <param name="ask">Sends the prompt to the provider chosen by the request's "model" (null = the default one).</param>
+    /// <param name="defaultProviderId">Provider used when the request names no known model.</param>
+    public LocalApiServer(
+        int port,
+        Func<string, string?, CancellationToken, Task<AutomationOutcome>> ask,
+        Func<string>? defaultProviderId = null)
     {
         Port = port;
         _ask = ask;
+        _defaultProviderId = defaultProviderId ?? (() => ProviderCatalog.DefaultId);
         _listener.Prefixes.Add($"http://127.0.0.1:{port}/");
     }
 
@@ -91,7 +99,12 @@ public sealed class LocalApiServer : IDisposable
         {
             return Error(403, "Forbidden");
         }
-        if (request.HttpMethod != "POST" || request.Url?.AbsolutePath.TrimEnd('/') != "/v1/chat/completions")
+        var path = request.Url?.AbsolutePath.TrimEnd('/');
+        if (request.HttpMethod == "GET" && path == "/v1/models")
+        {
+            return (200, ListModels());
+        }
+        if (request.HttpMethod != "POST" || path != "/v1/chat/completions")
         {
             return Error(404, "Not Found");
         }
@@ -116,7 +129,9 @@ public sealed class LocalApiServer : IDisposable
             return Error(400, "Body phải là JSON có messages");
         }
 
-        var outcome = await _ask(prompt, token).ConfigureAwait(false);
+        var model = ReadModel(body);
+        var provider = ProviderCatalog.ByModel(model) ?? ProviderCatalog.ById(_defaultProviderId());
+        var outcome = await _ask(prompt, model, token).ConfigureAwait(false);
         if (outcome.Status != AutomationStatus.Success || string.IsNullOrWhiteSpace(outcome.Text))
         {
             return Error(502, string.IsNullOrWhiteSpace(outcome.Text) ? "Gemini không trả lời" : outcome.Text);
@@ -124,7 +139,7 @@ public sealed class LocalApiServer : IDisposable
         return (200, new JsonObject
         {
             ["object"] = "chat.completion",
-            ["model"] = "gemini-web",
+            ["model"] = provider.ApiModelName,
             ["choices"] = new JsonArray(new JsonObject
             {
                 ["index"] = 0,
@@ -160,6 +175,37 @@ public sealed class LocalApiServer : IDisposable
             }
         }
         return parts.Count == 0 ? null : string.Join(" ||| ", parts);
+    }
+
+    /// <summary>The request's "model" string, or null when absent. Picks the provider by prefix ("deepseek...", "gemini...").</summary>
+    internal static string? ReadModel(string body)
+    {
+        try
+        {
+            return JsonNode.Parse(body)?["model"] is JsonValue value && value.TryGetValue<string>(out var model)
+                ? model
+                : null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>OpenAI-style model list so clients that probe GET /v1/models can discover the providers.</summary>
+    internal static JsonObject ListModels()
+    {
+        var data = new JsonArray();
+        foreach (var provider in ProviderCatalog.All)
+        {
+            data.Add(new JsonObject
+            {
+                ["id"] = provider.ApiModelName,
+                ["object"] = "model",
+                ["owned_by"] = "local",
+            });
+        }
+        return new JsonObject { ["object"] = "list", ["data"] = data };
     }
 
     private static (int, JsonObject) Error(int status, string message) =>

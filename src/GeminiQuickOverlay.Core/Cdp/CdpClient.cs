@@ -50,7 +50,8 @@ public sealed class CdpClient : IAsyncDisposable
 
     public static async Task<CdpClient> ConnectAsync(
         int port,
-        string targetMatch = "gemini.google.com",
+        string targetMatch,
+        string startUrl,
         CancellationToken cancellationToken = default)
     {
         using var http = new CdpHttpClient();
@@ -110,7 +111,7 @@ public sealed class CdpClient : IAsyncDisposable
         }
 
         var target = await http.FindTargetAsync(netloc, targetMatch, cancellationToken).ConfigureAwait(false);
-        target ??= await http.CreateTargetAsync(netloc, targetMatch, cancellationToken).ConfigureAwait(false);
+        target ??= await http.CreateTargetAsync(netloc, targetMatch, startUrl, cancellationToken).ConfigureAwait(false);
         if (target is null)
         {
             throw new CdpUnavailableException($"Không tìm thấy tab chứa '{targetMatch}'.");
@@ -118,7 +119,7 @@ public sealed class CdpClient : IAsyncDisposable
 
         if (string.IsNullOrWhiteSpace(target.WebSocketDebuggerUrl))
         {
-            throw new CdpUnavailableException("Tab Gemini không có WebSocket debugger URL.");
+            throw new CdpUnavailableException($"Tab '{targetMatch}' không có WebSocket debugger URL.");
         }
 
         var socket = new ClientWebSocket();

@@ -12,6 +12,7 @@ using GeminiQuickOverlay.Core.Automation;
 using GeminiQuickOverlay.Core.Chrome;
 using GeminiQuickOverlay.Core.Config;
 using GeminiQuickOverlay.Core.Logging;
+using GeminiQuickOverlay.Core.Models;
 using GeminiQuickOverlay.Core.Paths;
 using GeminiQuickOverlay.Core.Updates;
 
@@ -413,7 +414,7 @@ public partial class App : System.Windows.Application
 
         try
         {
-            _apiServer = new LocalApiServer(config.ApiServerPort, AskFromApiAsync);
+            _apiServer = new LocalApiServer(config.ApiServerPort, AskFromApiAsync, () => _config!.Current.Provider);
             _apiServer.Start();
             _overlay!.ShowMessage($"Cổng API đang bật: http://127.0.0.1:{config.ApiServerPort}/v1", 4);
         }
@@ -426,6 +427,11 @@ public partial class App : System.Windows.Application
         }
     }
 
-    private Task<AutomationOutcome> AskFromApiAsync(string prompt, CancellationToken token) =>
-        _automation!.SendAndGetResponseAsync(prompt, isImage: false, imagePng: null, token);
+    private Task<AutomationOutcome> AskFromApiAsync(string prompt, string? model, CancellationToken token) =>
+        _automation!.SendAndGetResponseAsync(
+            prompt,
+            isImage: false,
+            imagePng: null,
+            token,
+            providerId: ProviderCatalog.ByModel(model)?.Id);
 }

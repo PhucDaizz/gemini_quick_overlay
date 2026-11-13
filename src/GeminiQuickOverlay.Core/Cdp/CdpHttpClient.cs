@@ -64,13 +64,14 @@ internal sealed class CdpHttpClient : IDisposable
     public async Task<CdpTarget?> CreateTargetAsync(
         string netloc,
         string targetMatch,
+        string startUrl,
         CancellationToken cancellationToken)
     {
         var created = false;
         foreach (var url in new[]
                  {
-                     $"http://{netloc}/json/new?{AppConstants.GeminiUrl}",
-                     $"http://{netloc}/json/new?{Uri.EscapeDataString(AppConstants.GeminiUrl)}",
+                     $"http://{netloc}/json/new?{startUrl}",
+                     $"http://{netloc}/json/new?{Uri.EscapeDataString(startUrl)}",
                  })
         {
             foreach (var method in new[] { HttpMethod.Put, HttpMethod.Get })

@@ -64,6 +64,12 @@ public sealed class AppConfig
 
     public Selectors Selectors { get; set; } = new();
 
+    /// <summary>Which chat the hotkeys use: "gemini" or "deepseek" (the API picks one per request via "model").</summary>
+    public string Provider { get; set; } = ProviderCatalog.DefaultId;
+
+    /// <summary>Optional per-provider selector overrides: { "deepseek": { "response": "...", "send": "" } }.</summary>
+    public Dictionary<string, Dictionary<string, string>> ProviderSelectors { get; set; } = new();
+
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? ExtraData { get; set; }
 
@@ -71,6 +77,10 @@ public sealed class AppConfig
     {
         var clone = (AppConfig)MemberwiseClone();
         clone.Selectors = Selectors.Clone();
+        clone.ProviderSelectors = ProviderSelectors?.ToDictionary(
+            pair => pair.Key,
+            pair => new Dictionary<string, string>(pair.Value),
+            StringComparer.OrdinalIgnoreCase) ?? new();
         if (ExtraData is not null)
         {
             clone.ExtraData = new Dictionary<string, JsonElement>(ExtraData);

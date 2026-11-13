@@ -90,6 +90,8 @@ public partial class SettingsWindow : Window
         HotkeyHideBox.Text = _draft.HotkeyHide;
         HotkeyCaptureBox.Text = _draft.HotkeyCapture;
 
+        ProviderBox.ItemsSource = ProviderCatalog.All;
+        ProviderBox.SelectedValue = ProviderCatalog.ById(_draft.Provider).Id;
         ProfileDirBox.Text = _draft.ProfileDir;
         DebugPortBox.Text = _draft.DebugPort.ToString(CultureInfo.CurrentCulture);
     }
@@ -151,7 +153,9 @@ public partial class SettingsWindow : Window
         TestStatusText.Text = "Đang kiểm tra kết nối...";
         try
         {
-            var result = await _automation.TestConnectionAsync(_lifetime.Token);
+            var result = await _automation.TestConnectionAsync(
+                _lifetime.Token,
+                ProviderBox.SelectedValue as string);
             TestStatusText.Text = result;
         }
         catch (OperationCanceledException)
@@ -511,6 +515,7 @@ public partial class SettingsWindow : Window
         draft.HotkeyCapture = HotkeyCaptureBox.Text.Trim();
 
         draft.ProfileDir = ProfileDirBox.Text.Trim();
+        draft.Provider = ProviderBox.SelectedValue as string ?? ProviderCatalog.DefaultId;
         draft.DebugPort = debugPort;
         return true;
     }

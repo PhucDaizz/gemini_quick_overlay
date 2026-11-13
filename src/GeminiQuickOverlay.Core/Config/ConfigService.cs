@@ -150,6 +150,8 @@ public sealed class ConfigService : IDisposable
                 return config;
             }
             loaded.Selectors ??= new Selectors();
+            loaded.ProviderSelectors ??= new();
+            loaded.Provider = string.IsNullOrWhiteSpace(loaded.Provider) ? ProviderCatalog.DefaultId : loaded.Provider;
             AppLog.Info($"Đã load config từ: {_path}");
             return loaded;
         }

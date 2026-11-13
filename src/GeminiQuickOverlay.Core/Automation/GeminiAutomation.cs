@@ -11,7 +11,7 @@ public sealed class GeminiAutomation : IAsyncDisposable
 {
     private readonly ConfigService _config;
     private readonly SemaphoreSlim _operation = new(1, 1);
-    private CdpClient? _client;
+    private readonly Dictionary<string, CdpClient> _clients = new();
     private string? _fatal;
     private string? _lastError;
 
@@ -25,40 +25,48 @@ public sealed class GeminiAutomation : IAsyncDisposable
         bool isImage,
         byte[]? imagePng,
         CancellationToken cancellationToken = default,
-        bool pasteWithShortcut = true)
+        bool pasteWithShortcut = true,
+        string? providerId = null)
     {
         await _operation.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            if (!await EnsureClientLockedAsync(cancellationToken).ConfigureAwait(false))
+            var config = _config.Current;
+            var provider = ProviderCatalog.ById(providerId ?? config.Provider);
+            if (isImage && !provider.SupportsImage)
+            {
+                return AutomationOutcome.Error(
+                    $"Lỗi: {provider.DisplayName} chưa hỗ trợ gửi ảnh. Hãy đổi nhà cung cấp sang Gemini trong Cài đặt.");
+            }
+
+            if (!await EnsureClientLockedAsync(provider, cancellationToken).ConfigureAwait(false))
             {
                 return AutomationOutcome.Error(
                     _fatal ?? _lastError ?? "Lỗi: chưa kết nối được Chrome.");
             }
 
-            var client = _client!;
-            var config = _config.Current;
-            var selectors = config.Selectors;
+            var client = _clients[provider.Id];
+            var selectors = ProviderCatalog.EffectiveSelectors(provider, config);
 
             try
             {
-                var status = await WaitForReadyStatusAsync(config, selectors, cancellationToken)
+                var status = await WaitForReadyStatusAsync(provider, config, selectors, cancellationToken)
                     .ConfigureAwait(false);
                 if (status is null)
                 {
                     return AutomationOutcome.Error(
-                        "Lỗi: Không tìm thấy ô nhập Gemini. Có thể chưa đăng nhập " +
+                        $"Lỗi: Không tìm thấy ô nhập {provider.DisplayName}. Có thể chưa đăng nhập " +
                         "hoặc giao diện đã đổi (kiểm tra selectors.input).");
                 }
                 if (status.SignedOut)
                 {
                     return AutomationOutcome.Error(
-                        "Lỗi: Chưa đăng nhập Gemini. Hãy đăng nhập trong tab Chrome.");
+                        $"Lỗi: Chưa đăng nhập {provider.DisplayName}. Hãy đăng nhập trong tab Chrome.");
                 }
                 if (!status.Input)
                 {
                     return AutomationOutcome.Error(
-                        "Lỗi: Không tìm thấy ô nhập Gemini. Có thể chưa đăng nhập " +
+                        $"Lỗi: Không tìm thấy ô nhập {provider.DisplayName}. Có thể chưa đăng nhập " +
                         "hoặc giao diện đã đổi (kiểm tra selectors.input).");
                 }
 
@@ -90,7 +98,7 @@ public sealed class GeminiAutomation : IAsyncDisposable
                     .ConfigureAwait(false);
                 if (!focused)
                 {
-                    return AutomationOutcome.Error("Lỗi: Không tìm thấy ô nhập của Gemini.");
+                    return AutomationOutcome.Error($"Lỗi: Không tìm thấy ô nhập của {provider.DisplayName}.");
                 }
 
                 if (isImage)
@@ -170,7 +178,7 @@ public sealed class GeminiAutomation : IAsyncDisposable
 
                 return AutomationOutcome.Error(
                     "Không lấy được phản hồi mới (hết thời gian). " +
-                    "Kiểm tra selectors.response hoặc trạng thái Gemini.");
+                    $"Kiểm tra selectors.response hoặc trạng thái {provider.DisplayName}.");
             }
             catch (OperationCanceledException)
             {
@@ -180,7 +188,7 @@ public sealed class GeminiAutomation : IAsyncDisposable
             catch (Exception exception)
             {
                 AppLog.Error(exception, "Lỗi CDP khi tương tác");
-                await ResetClientAsync().ConfigureAwait(false);
+                await ResetClientAsync(provider.Id).ConfigureAwait(false);
                 return AutomationOutcome.Error($"Lỗi khi tương tác: {exception.Message}");
             }
         }
@@ -190,32 +198,39 @@ public sealed class GeminiAutomation : IAsyncDisposable
         }
     }
 
-    public async Task<string> TestConnectionAsync(CancellationToken cancellationToken = default)
+    public async Task<string> TestConnectionAsync(
+        CancellationToken cancellationToken = default,
+        string? providerId = null)
     {
         await _operation.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            if (!await EnsureClientLockedAsync(cancellationToken).ConfigureAwait(false))
+            var config = _config.Current;
+            var provider = ProviderCatalog.ById(providerId ?? config.Provider);
+            if (!await EnsureClientLockedAsync(provider, cancellationToken).ConfigureAwait(false))
             {
                 return _fatal ?? _lastError ?? "Không kết nối được Chrome.";
             }
 
-            var config = _config.Current;
-            var status = await WaitForReadyStatusAsync(config, config.Selectors, cancellationToken)
+            var status = await WaitForReadyStatusAsync(
+                    provider,
+                    config,
+                    ProviderCatalog.EffectiveSelectors(provider, config),
+                    cancellationToken)
                 .ConfigureAwait(false);
             if (status is null)
             {
-                return "Không tìm thấy ô nhập Gemini. Kiểm tra đăng nhập hoặc selectors.";
+                return $"Không tìm thấy ô nhập {provider.DisplayName}. Kiểm tra đăng nhập hoặc selectors.";
             }
             if (status.SignedOut)
             {
-                return "Chưa đăng nhập Gemini. Hãy đăng nhập trong Chrome.";
+                return $"Chưa đăng nhập {provider.DisplayName}. Hãy đăng nhập trong Chrome.";
             }
             if (!status.Input)
             {
-                return "Không tìm thấy ô nhập Gemini. Kiểm tra đăng nhập hoặc selectors.";
+                return $"Không tìm thấy ô nhập {provider.DisplayName}. Kiểm tra đăng nhập hoặc selectors.";
             }
-            return "Kết nối Gemini OK.";
+            return $"Kết nối {provider.DisplayName} OK.";
         }
         catch (Exception exception)
         {
@@ -229,22 +244,24 @@ public sealed class GeminiAutomation : IAsyncDisposable
 
     public async Task CancelAsync()
     {
-        var client = _client;
-        if (client is null || client.IsClosed)
+        foreach (var client in _clients.Values.ToArray())
         {
-            return;
-        }
+            if (client.IsClosed)
+            {
+                continue;
+            }
 
-        try
-        {
-            await client.EvaluateAsync(
-                    "window.__geminiCancel = true;",
-                    cancellationToken: CancellationToken.None,
-                    timeout: TimeSpan.FromSeconds(2))
-                .ConfigureAwait(false);
-        }
-        catch
-        {
+            try
+            {
+                await client.EvaluateAsync(
+                        "window.__geminiCancel = true;",
+                        cancellationToken: CancellationToken.None,
+                        timeout: TimeSpan.FromSeconds(2))
+                    .ConfigureAwait(false);
+            }
+            catch
+            {
+            }
         }
     }
 
@@ -262,20 +279,20 @@ public sealed class GeminiAutomation : IAsyncDisposable
         }
     }
 
-    private async Task<bool> EnsureClientLockedAsync(CancellationToken cancellationToken)
+    private async Task<bool> EnsureClientLockedAsync(ProviderProfile provider, CancellationToken cancellationToken)
     {
         if (_fatal is not null)
         {
             return false;
         }
 
-        if (_client is not null)
+        if (_clients.TryGetValue(provider.Id, out var existing))
         {
-            if (!_client.IsClosed && await _client.EnsureReadyAsync(cancellationToken).ConfigureAwait(false))
+            if (!existing.IsClosed && await existing.EnsureReadyAsync(cancellationToken).ConfigureAwait(false))
             {
                 return true;
             }
-            await ResetClientAsync().ConfigureAwait(false);
+            await ResetClientAsync(provider.Id).ConfigureAwait(false);
         }
 
         var config = _config.Current;
@@ -289,9 +306,10 @@ public sealed class GeminiAutomation : IAsyncDisposable
 
         try
         {
-            _client = await CdpClient.ConnectAsync(
+            _clients[provider.Id] = await CdpClient.ConnectAsync(
                     config.DebugPort,
-                    "gemini.google.com",
+                    provider.TargetMatch,
+                    provider.Url,
                     cancellationToken)
                 .ConfigureAwait(false);
             return true;
@@ -314,17 +332,21 @@ public sealed class GeminiAutomation : IAsyncDisposable
         }
     }
 
-    private async Task ResetClientAsync()
+    /// <summary>Closes one provider's connection, or all of them when no id is given.</summary>
+    private async Task ResetClientAsync(string? providerId = null)
     {
-        var client = _client;
-        _client = null;
-        if (client is not null)
+        var ids = providerId is null ? _clients.Keys.ToArray() : new[] { providerId };
+        foreach (var id in ids)
         {
-            await client.DisposeAsync().ConfigureAwait(false);
+            if (_clients.Remove(id, out var client))
+            {
+                await client.DisposeAsync().ConfigureAwait(false);
+            }
         }
     }
 
     private async Task<PageStatus?> WaitForReadyStatusAsync(
+        ProviderProfile provider,
         AppConfig config,
         Selectors selectors,
         CancellationToken cancellationToken)
@@ -332,8 +354,7 @@ public sealed class GeminiAutomation : IAsyncDisposable
         var deadline = DateTime.UtcNow.AddSeconds(config.PageWait);
         while (DateTime.UtcNow < deadline)
         {
-            var client = _client;
-            if (client is null || client.IsClosed)
+            if (!_clients.TryGetValue(provider.Id, out var client) || client.IsClosed)
             {
                 return null;
             }
@@ -341,7 +362,7 @@ public sealed class GeminiAutomation : IAsyncDisposable
             try
             {
                 var result = await client.EvaluateAsync(
-                        JavaScriptLibrary.Status(selectors.Input, selectors.Send),
+                        JavaScriptLibrary.Status(selectors.Input, selectors.Send, provider.SignedOutPattern),
                         cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
                 if (result is not null && result.Value.ValueKind == JsonValueKind.Object)
@@ -360,7 +381,7 @@ public sealed class GeminiAutomation : IAsyncDisposable
             }
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
-                AppLog.Debug($"Trang Gemini chưa sẵn sàng: {exception.Message}");
+                AppLog.Debug($"Trang {provider.DisplayName} chưa sẵn sàng: {exception.Message}");
             }
 
             await Task.Delay(200, cancellationToken).ConfigureAwait(false);

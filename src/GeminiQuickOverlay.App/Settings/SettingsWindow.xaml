@@ -204,11 +204,16 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="Gemini &amp; Chrome">
+            <TabItem Header="Chat AI &amp; Chrome">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="0,12,8,0">
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
+                                <TextBlock Text="Nhà cung cấp chat" Style="{StaticResource CardTitle}" />
+                                <TextBlock Text="Dùng cho phím gửi / chụp vùng (cổng API chọn theo trường &quot;model&quot;)" Style="{StaticResource FieldLabel}" />
+                                <ComboBox x:Name="ProviderBox" Width="220" HorizontalAlignment="Left" Margin="0,0,0,6" DisplayMemberPath="DisplayName" SelectedValuePath="Id" />
+                                <TextBlock Style="{StaticResource Hint}" Margin="0,0,0,18"
+                                           Text="Mỗi nhà cung cấp mở một tab riêng trong cùng Chrome. Bạn cần đăng nhập sẵn trong tab đó. DeepSeek hiện chỉ hỗ trợ văn bản." />
                                 <TextBlock Text="Chrome" Style="{StaticResource CardTitle}" />
                                 <TextBlock Text="Thư mục profile" Style="{StaticResource FieldLabel}" />
                                 <Grid Margin="0,0,0,14">
@@ -233,7 +238,7 @@
                                 <TextBlock Text="Kiểm tra" Style="{StaticResource CardTitle}" />
                                 <StackPanel Orientation="Horizontal">
                                     <Button x:Name="ShowChromeButton" Content="Mở Chrome" MinWidth="120" Click="ShowChrome_Click" />
-                                    <Button x:Name="TestButton" Content="Test Gemini" MinWidth="120" Margin="8,0,0,0" Click="Test_Click" />
+                                    <Button x:Name="TestButton" Content="Test kết nối" MinWidth="120" Margin="8,0,0,0" Click="Test_Click" />
                                 </StackPanel>
                                 <TextBlock x:Name="TestStatusText" TextWrapping="Wrap" Margin="0,12,0,0" />
                             </StackPanel>

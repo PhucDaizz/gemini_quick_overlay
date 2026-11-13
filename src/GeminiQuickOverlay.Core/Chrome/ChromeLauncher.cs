@@ -153,7 +153,7 @@ public static class ChromeLauncher
         {
             var port = Math.Clamp(config.DebugPort, 1, 65535);
             var arguments = BuildArguments(port, ProfileDir(config));
-            arguments.Add(AppConstants.GeminiUrl);
+            arguments.Add(ProviderCatalog.ById(config.Provider).Url);
             Process.Start(new ProcessStartInfo
             {
                 FileName = chrome,

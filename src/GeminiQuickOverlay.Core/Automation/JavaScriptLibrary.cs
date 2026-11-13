@@ -27,6 +27,7 @@ internal static class JavaScriptLibrary
               const e=document.querySelector({{selectorJson}});
               if(!e)return false;
               e.focus();
+              if(e instanceof HTMLTextAreaElement||e instanceof HTMLInputElement){e.select();return true;}
               const s=window.getSelection();
               const r=document.createRange();
               r.selectNodeContents(e);
@@ -43,7 +44,7 @@ internal static class JavaScriptLibrary
         return $$"""
             (function(){
               const e=document.querySelector({{selectorJson}});
-              return e?(e.innerText||''):'';
+              return e?((typeof e.value==='string'?e.value:e.innerText)||''):'';
             })()
             """;
     }
@@ -57,6 +58,13 @@ internal static class JavaScriptLibrary
               const e=document.querySelector({{selectorJson}});
               if(!e)return false;
               e.focus();
+              if(e instanceof HTMLTextAreaElement||e instanceof HTMLInputElement){
+                // React-style controlled inputs ignore plain .value writes: use the native setter and fire "input".
+                const proto=e instanceof HTMLTextAreaElement?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
+                Object.getOwnPropertyDescriptor(proto,'value').set.call(e,{{textJson}});
+                e.dispatchEvent(new Event('input',{bubbles:true}));
+                return true;
+              }
               document.execCommand('insertText',false,{{textJson}});
               return true;
             })()
@@ -69,7 +77,7 @@ internal static class JavaScriptLibrary
         return $$"""
             (function(){
               const b=document.querySelector({{selectorJson}});
-              if(b&&!b.disabled){b.click();return true;}
+              if(b&&!b.disabled&&b.getAttribute('aria-disabled')!=='true'){b.click();return true;}
               return false;
             })()
             """;
@@ -81,21 +89,23 @@ internal static class JavaScriptLibrary
         return $$"""
             (function(){
               const b=document.querySelector({{selectorJson}});
-              return !!(b&&!b.disabled);
+              return !!(b&&!b.disabled&&b.getAttribute('aria-disabled')!=='true');
             })()
             """;
     }
 
-    public static string Status(string inputSelector, string sendSelector)
+    public static string Status(string inputSelector, string sendSelector, string signedOutPattern)
     {
         var inputJson = JsonSerializer.Serialize(inputSelector);
-        var sendJson = JsonSerializer.Serialize(sendSelector);
+        // An empty selector means "no send button, press Enter" and must not be passed to querySelector.
+        var sendJson = JsonSerializer.Serialize(string.IsNullOrWhiteSpace(sendSelector) ? "#__no-send-button__" : sendSelector);
+        var patternJson = JsonSerializer.Serialize(signedOutPattern);
         return $$"""
             (function(){
               const input=document.querySelector({{inputJson}});
               const send=document.querySelector({{sendJson}});
               const url=location.href;
-              const signedOut=/accounts\.google\.com|servicelogin/i.test(url);
+              const signedOut=new RegExp({{patternJson}},'i').test(url);
               return{url:url,input:!!input,send:!!send,signedOut:signedOut};
             })()
             """;

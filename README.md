@@ -134,6 +134,33 @@ Các phím trên có thể đổi trong `config.json` qua `hotkey_send`, `hotkey
 - Hoặc mở Task Manager → tìm `GeminiQuickOverlay` → End task.
 - Nếu bạn đổi tên file `.exe`, sửa lại tên tương ứng trong `TAT_TOOL.bat`.
 
+## 🤖 Nhà cung cấp chat (Gemini / DeepSeek)
+
+Tool điều khiển trang chat đã đăng nhập sẵn trong Chrome của bạn, nên không cần API key. Chọn trang dùng cho phím gửi (F2) và chụp vùng (F6) ở **Cài đặt → Chat AI & Chrome → Nhà cung cấp chat**, hoặc đặt `"provider"` trong `config.json`.
+
+| Nhà cung cấp | `provider` | Trang | Gửi ảnh |
+|--------------|-----------|-------|---------|
+| Gemini *(mặc định)* | `gemini` | `gemini.google.com` | Có |
+| DeepSeek | `deepseek` | `chat.deepseek.com` | Chưa (chỉ văn bản) |
+
+- Mỗi nhà cung cấp dùng **một tab riêng** trong cùng Chrome profile; tool tự mở tab nếu chưa có. Bạn cần **đăng nhập sẵn** trong tab đó (nếu chưa, tool báo "Chưa đăng nhập ...").
+- **DeepSeek:** tool không đụng tới nút DeepThink / Search, bạn tự bật tắt trên trang (mặc định tắt). Câu hỏi được gửi bằng phím Enter.
+- Khi Google/DeepSeek đổi giao diện, sửa selector mà không cần phát hành lại, ví dụ:
+  ```json
+  "provider_selectors": { "deepseek": { "response": ".css-moi", "send": "button.gui" } }
+  ```
+  (các khóa: `response`, `input`, `send`, `image_preview`; `send` để trống nghĩa là bấm Enter). Khóa `selectors` cũ vẫn chỉ áp dụng cho Gemini.
+
+### Cổng API nội bộ (tùy chọn, mặc định TẮT)
+Đặt `"api_server_enabled": true` (cổng `api_server_port`, mặc định 8765) để chương trình khác **trên cùng máy** gọi theo kiểu OpenAI tại `http://127.0.0.1:8765/v1`. Trường `model` chọn nhà cung cấp theo tiền tố: `deepseek...` dùng DeepSeek, `gemini...` dùng Gemini, giá trị khác dùng nhà cung cấp mặc định. `GET /v1/models` liệt kê `gemini-web` và `deepseek-web`.
+
+```bash
+curl http://127.0.0.1:8765/v1/chat/completions -H "Content-Type: application/json" \
+  -d '{"model":"deepseek-web","messages":[{"role":"user","content":"2+2 bang may?"}]}'
+```
+
+Lưu ý: cổng chỉ nghe trên `127.0.0.1`, từ chối request từ trình duyệt (`Origin`), nhưng **chưa có xác thực**: mọi chương trình trên máy đều gọi được khi bạn bật. Chưa hỗ trợ `stream`, ảnh, và xuống dòng trong câu hỏi bị gộp thành một dòng.
+
 ## ⚙️ Tùy chỉnh (File `config.json`)
 
 Bạn có thể mở file `config.json` bằng Notepad để chỉnh sửa các thông số:
@@ -211,7 +238,7 @@ This application has no telemetry and no account of its own. It only communicate
 
 | What | Where it goes | When | How to turn it off |
 |------|---------------|------|--------------------|
-| Text from your clipboard, or the image / screen region you choose to send | **Google Gemini** (`gemini.google.com`), through **your own** Chrome profile that you are signed in to. The app itself never talks to Google; it drives that Chrome over the local debug port (`127.0.0.1`). Google's own privacy policy applies to what Gemini receives. | Only when you press the send or capture hotkey | Do not press the hotkeys |
+| Text from your clipboard, or the image / screen region you choose to send | The chat website you selected in Settings: **Google Gemini** (`gemini.google.com`, default) or **DeepSeek** (`chat.deepseek.com`, text only), through **your own** Chrome profile that you are signed in to. The app itself never talks to these sites; it drives that Chrome over the local debug port (`127.0.0.1`). Google's own privacy policy applies to what Gemini receives. | Only when you press the send or capture hotkey, or when a program on your own PC calls the optional local API (see below) | Do not press the hotkeys; keep `api_server_enabled` set to `false` (the default) |
 | Release information | `api.github.com` (latest release tag only; nothing about you is sent) | At startup, at most once a day, and when you choose "Check for updates" | Set `check_updates` to `false` in `config.json` or untick it in Settings |
 
 Everything else stays on your machine: settings are in `config.json`, and the log file `gemini_helper.log` contains only operational messages (such as hotkey registration, Chrome start and error messages) and the address of the Gemini tab, not your questions or answers. The last answer is kept in memory only until the app closes.
