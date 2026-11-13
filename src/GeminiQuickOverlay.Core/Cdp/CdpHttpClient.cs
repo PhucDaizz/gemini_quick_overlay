@@ -116,5 +116,21 @@ internal sealed class CdpHttpClient : IDisposable
         return null;
     }
 
+    /// <summary>Brings the tab to the front of its window (GET /json/activate/{id}).</summary>
+    public async Task<bool> ActivateTargetAsync(string netloc, string targetId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var response = await _http
+                .GetAsync($"http://{netloc}/json/activate/{Uri.EscapeDataString(targetId)}", cancellationToken)
+                .ConfigureAwait(false);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            return false;
+        }
+    }
+
     public void Dispose() => _http.Dispose();
 }

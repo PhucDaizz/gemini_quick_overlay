@@ -67,6 +67,12 @@ public sealed class AppConfig
     /// <summary>Which chat the hotkeys use: "gemini" or "deepseek" (the API picks one per request via "model").</summary>
     public string Provider { get; set; } = ProviderCatalog.DefaultId;
 
+    /// <summary>
+    /// Several providers share one Chrome window, so all but one tab are hidden and the browser throttles hidden
+    /// tabs. When on, the provider's tab is brought to the front before sending if it is currently hidden.
+    /// </summary>
+    public bool ActivateProviderTab { get; set; } = true;
+
     /// <summary>Optional per-provider selector overrides: { "deepseek": { "response": "...", "send": "" } }.</summary>
     public Dictionary<string, Dictionary<string, string>> ProviderSelectors { get; set; } = new();
 

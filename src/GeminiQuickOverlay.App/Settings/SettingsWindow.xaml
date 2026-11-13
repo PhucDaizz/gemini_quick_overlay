@@ -214,6 +214,7 @@
                                 <ComboBox x:Name="ProviderBox" Width="220" HorizontalAlignment="Left" Margin="0,0,0,6" DisplayMemberPath="DisplayName" SelectedValuePath="Id" />
                                 <TextBlock Style="{StaticResource Hint}" Margin="0,0,0,18"
                                            Text="Mỗi nhà cung cấp mở một tab riêng trong cùng Chrome. Bạn cần đăng nhập sẵn trong tab đó. DeepSeek hiện chỉ hỗ trợ văn bản." />
+                                <CheckBox x:Name="ActivateTabCheck" Content="Tự đưa tab của nhà cung cấp ra trước khi gửi (nếu đang bị ẩn)" Margin="0,0,0,18" />
                                 <TextBlock Text="Chrome" Style="{StaticResource CardTitle}" />
                                 <TextBlock Text="Thư mục profile" Style="{StaticResource FieldLabel}" />
                                 <Grid Margin="0,0,0,14">

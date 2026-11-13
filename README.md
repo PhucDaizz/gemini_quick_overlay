@@ -144,6 +144,7 @@ Tool điều khiển trang chat đã đăng nhập sẵn trong Chrome của bạ
 | DeepSeek | `deepseek` | `chat.deepseek.com` | Chưa (chỉ văn bản) |
 
 - Mỗi nhà cung cấp dùng **một tab riêng** trong cùng Chrome profile; tool tự mở tab nếu chưa có. Bạn cần **đăng nhập sẵn** trong tab đó (nếu chưa, tool báo "Chưa đăng nhập ...").
+- Các tab của nhà cung cấp nằm chung một cửa sổ Chrome nên chỉ một tab hiển thị, trình duyệt làm chậm các tab ẩn. Vì vậy trước khi gửi, tool **tự đưa tab của nhà cung cấp ra trước nếu nó đang ẩn** (tắt bằng `"activate_provider_tab": false` hoặc trong Cài đặt). Việc này làm cửa sổ Chrome nhảy lên khi bạn đổi qua lại giữa hai nhà cung cấp.
 - **DeepSeek:** tool không đụng tới nút DeepThink / Search, bạn tự bật tắt trên trang (mặc định tắt). Câu hỏi được gửi bằng phím Enter.
 - Khi Google/DeepSeek đổi giao diện, sửa selector mà không cần phát hành lại, ví dụ:
   ```json

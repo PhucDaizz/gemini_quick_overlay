@@ -131,9 +131,11 @@ public sealed class LocalApiServer : IDisposable
 
         var model = ReadModel(body);
         var provider = ProviderCatalog.ByModel(model) ?? ProviderCatalog.ById(_defaultProviderId());
+        AppLog.Info($"Cổng API: yêu cầu cho {provider.Id} (model='{model ?? "-"}')");
         var outcome = await _ask(prompt, model, token).ConfigureAwait(false);
         if (outcome.Status != AutomationStatus.Success || string.IsNullOrWhiteSpace(outcome.Text))
         {
+            AppLog.Warn($"Cổng API ({provider.Id}) thất bại: {(string.IsNullOrWhiteSpace(outcome.Text) ? outcome.Status.ToString() : outcome.Text)}");
             return Error(502, string.IsNullOrWhiteSpace(outcome.Text) ? "Gemini không trả lời" : outcome.Text);
         }
         return (200, new JsonObject

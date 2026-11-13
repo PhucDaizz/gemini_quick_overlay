@@ -47,6 +47,8 @@ public sealed class GeminiAutomation : IAsyncDisposable
 
             var client = _clients[provider.Id];
             var selectors = ProviderCatalog.EffectiveSelectors(provider, config);
+            AppLog.Info($"Gửi tới {provider.DisplayName}...");
+            await EnsureTabVisibleAsync(client, provider, config, cancellationToken).ConfigureAwait(false);
 
             try
             {
@@ -425,6 +427,53 @@ public sealed class GeminiAutomation : IAsyncDisposable
                 return;
             }
             await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// With several providers in one window only one tab is visible; browsers throttle the hidden ones, which can
+    /// stall the answer. Bring ours to the front when it is hidden (and only then, to avoid stealing focus on every send).
+    /// </summary>
+    private static async Task EnsureTabVisibleAsync(
+        CdpClient client,
+        ProviderProfile provider,
+        AppConfig config,
+        CancellationToken cancellationToken)
+    {
+        if (!config.ActivateProviderTab)
+        {
+            return;
+        }
+
+        try
+        {
+            if (AsString(await client.EvaluateAsync("document.visibilityState", cancellationToken: cancellationToken)
+                    .ConfigureAwait(false)) != "hidden")
+            {
+                return;
+            }
+
+            if (!await client.ActivateAsync(cancellationToken).ConfigureAwait(false))
+            {
+                AppLog.Warn($"Không đưa được tab {provider.DisplayName} ra trước.");
+                return;
+            }
+
+            for (var attempt = 0; attempt < 20; attempt++)
+            {
+                if (AsString(await client.EvaluateAsync("document.visibilityState", cancellationToken: cancellationToken)
+                        .ConfigureAwait(false)) == "visible")
+                {
+                    AppLog.Info($"Đã đưa tab {provider.DisplayName} ra trước.");
+                    return;
+                }
+                await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+            }
+            AppLog.Warn($"Tab {provider.DisplayName} vẫn chưa hiển thị sau khi kích hoạt.");
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            AppLog.Warn($"Không kiểm tra được trạng thái tab {provider.DisplayName}: {exception.Message}");
         }
     }
 

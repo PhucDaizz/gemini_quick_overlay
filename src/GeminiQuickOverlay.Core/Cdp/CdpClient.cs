@@ -28,6 +28,13 @@ public sealed class CdpClient : IAsyncDisposable
 
     public CdpTarget Target { get; }
 
+    /// <summary>Makes this client's tab the visible one in its Chrome window.</summary>
+    public async Task<bool> ActivateAsync(CancellationToken cancellationToken = default)
+    {
+        using var http = new CdpHttpClient();
+        return await http.ActivateTargetAsync(Netloc, Target.Id, cancellationToken).ConfigureAwait(false);
+    }
+
     public bool IsClosed
     {
         get

@@ -236,6 +236,7 @@ public partial class App : System.Windows.Application
             }
             if (outcome.Status == AutomationStatus.Error)
             {
+                AppLog.Warn($"Gửi thất bại: {outcome.Text}");
                 _overlay!.ShowMessage(outcome.Text, 6);
                 return;
             }

@@ -91,6 +91,7 @@ public partial class SettingsWindow : Window
         HotkeyCaptureBox.Text = _draft.HotkeyCapture;
 
         ProviderBox.ItemsSource = ProviderCatalog.All;
+        ActivateTabCheck.IsChecked = _draft.ActivateProviderTab;
         ProviderBox.SelectedValue = ProviderCatalog.ById(_draft.Provider).Id;
         ProfileDirBox.Text = _draft.ProfileDir;
         DebugPortBox.Text = _draft.DebugPort.ToString(CultureInfo.CurrentCulture);
@@ -516,6 +517,7 @@ public partial class SettingsWindow : Window
 
         draft.ProfileDir = ProfileDirBox.Text.Trim();
         draft.Provider = ProviderBox.SelectedValue as string ?? ProviderCatalog.DefaultId;
+        draft.ActivateProviderTab = ActivateTabCheck.IsChecked == true;
         draft.DebugPort = debugPort;
         return true;
     }
